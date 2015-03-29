@@ -45,8 +45,8 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(2);
-	var Griddle = __webpack_require__(4);
-	var $ = __webpack_require__(3);
+	var Griddle = __webpack_require__(3);
+	var $ = __webpack_require__(4);
 	var SkyLight = __webpack_require__(1);
 
 	var ImageComponent = React.createClass({displayName: "ImageComponent",
@@ -60,12 +60,15 @@
 	var Detail = React.createClass({displayName: "Detail",
 	  getInitialState:function () {
 	    return {
-	      detail: ''//this.fetchDetails(this.props.rowData.ID)
+	      detail: [{
+	        name:'',
+	        count:''
+	      }, {name:'', count:''}] //this.fetchDetails(this.props.rowData.ID)
 	    }
 	  },
 	  fetchDetails:function(id){
 	    var url = '/compositions/'+id;
-	    console.log(url);
+	    //console.log(url);
 
 	    $.ajax({
 	      url: url,
@@ -74,12 +77,10 @@
 	        console.log('error on post:' + error);
 	      },
 	      success: function(detail){
-	        //console.log('success: ' + data);
-	        //this.refs.searchInput.getDOMNode().value = '';
-	        //this.props.cb(data);
 	        this.setState({
-	          detail: detail
+	          detail: detail.PARTS
 	        })
+	        //console.log(detail);
 	      }.bind(this)
 	    })
 	  },
@@ -97,15 +98,19 @@
 	  /*<div className="btn btn-large btn-primary detail-btn" data-id={this.props.rowData.ID}>DETAIL</div>*/
 	  /*<button type="button" className="btn btn-large btn-primary" onClick={this.handleClick(this.props.rowData)}>DETAIL</button>*/
 	  render:function(){
+
+	    var list = this.state.detail.map(function(item,key){
+	      return React.createElement("li", {key: key}, " ", item.count, " | ", item.name, " ")
+	    })
 	    return (
 	      React.createElement("div", null, 
 	      React.createElement("button", {className: "btn btn-large btn-primary", onClick: this.showSimpleDialog}, "DETAIL"), 
 
 	      React.createElement(SkyLight, {ref: "simpleDialog", title: this.props.rowData.TITLE}, 
 	        React.createElement("h3", null, "Instruments"), 
-
-	          this.state.detail
-
+	          React.createElement("ul", null, 
+	            list
+	          )
 	      )
 	)
 	    )
@@ -117,69 +122,16 @@
 	  getInitialState:function () {
 	    return {
 	      data: this.fetchAllCompositions()
-	/*
-	      data: [
-	        {
-	          "PUBLISHER": "pub",
-	          "STYLE": "style",
-	          "TITLE": "foo",
-	          "PARTS": {
-	            "baritone_tc": "8", "timpani": "", "d_flat_piccolo": "", "f_horn_2": "", "percussion_other": "", "bassoon_2": "", "bassoon_1": "", "e_flat_horn_4": "", "e_flat_horn_3": "", "e_flat_horn_2": "", "c_piccolo": "",
-	            "string_bass": "", "f_horn_4": "", "baritone_bc": "7", "bass_clarinet": "", "trombone_3": "9", "oboe_1": "", "oboe_2": "", "percussion_1": "", "percussion_2": "", "trombone_2": "0", "f_horn_3": "",
-	            "solo_b_flat_clarinet": "", "f_horn_1": "", "cornet_1": "", "cornet_2": "", "cornet_3": "", "alto_saxophone_1": "", "alto_saxophone_2": "", "trumpet_3": "", "contrabass_clarinet": "", "trumpet_2": "",
-	            "b_flat_clarinet_3": "", "b_flat_clarinet_2": "", "soprano_saxophone": "", "mallets": "", "tenor_saxophone": "", "b_flat_clarinet_1": "", "solo_cornet": "", "e_flat_horn_1": "", "trombone_1": "3", "flute_1": "", "flute_2": "",
-	            "flute_3": "", "trumpet_1": "", "alto_clarinet": "", "bass_tuba": "6", "e_flat_clarinet": "", "baritone_saxophone": "", "b_flat_clarinet_4": ""
-	          },
-	          "COMPOSER": "foo comp",
-	          "DURATION": "1:02",
-	          "CONDENSED_SCORE": "",
-	          "DATE_LAST_PERFORMED": null,
-	          "COMMENTS": "",
-	          "ARRANGER": "",
-	          "DATE_LAST_PASSED_OUT": null,
-	          "COPYRIGHT_YEAR": null,
-	          "FULL_SCORE": ""
-	        }
-	        /*
-	        {
-	        title: 'Test Track',
-	        type: 'Type',
-	        composer: 'Composer',
-	        arranger: 'Arranger',
-	        duration: '2:33',
-	        publisher: 'Publisher',
-	        instruments: [
-	          "Horn 1", "Horn 2", "Drums", "Bass", "Flute 1", "Flute 2"
-	        ]
-	      },
-	      {
-	        title: 'Another Track',
-	        type: 'Diff',
-	        composer: 'Composer',
-	        arranger: 'Arranger',
-	        duration: '3:44',
-	        publisher: 'Publisher',
-	        instruments: [
-	          "Horn 1", "Drums", "Bass", "Flute 1", "Flute 2", "Guitar 1", "Guitar 2", "Oboe", "Accordian"
-	        ]
-	      }
-
-	      ]*/
 	    }
-
 	  },
 	  updateState:function (info) {
-	    //console.log(info);
 	    this.setState({
 	      data: info
 	    })
 	  },
 	  fetchAllCompositions:function(){
 	    var url = '/compositions';
-	    /*
-	    For Example,
-	    //`https://itunes.apple.com/search?term=${this.refs.searchInput.getDOMNode().value}&entity=${this.refs.selectInput.getDOMNode().value}&callback=cb`;
-	    */
+
 	    $.ajax({
 	      url: url,
 	      dataType: 'JSON',
@@ -187,9 +139,6 @@
 	        console.log('error on post:' + error);
 	      },
 	      success: function(data){
-	        //console.log('success: ' + data);
-	        //this.refs.searchInput.getDOMNode().value = '';
-	        //this.props.cb(data);
 	        this.setState({
 	          data: data
 	        })
@@ -272,6 +221,650 @@
 
 /***/ },
 /* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	/*
+	   Griddle - Simple Grid Component for React
+	   https://github.com/DynamicTyped/Griddle
+	   Copyright (c) 2014 Ryan Lanciaux | DynamicTyped
+
+	   See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
+	*/
+	var React = __webpack_require__(2);
+	var GridTable = __webpack_require__(5);
+	var GridFilter = __webpack_require__(6);
+	var GridPagination = __webpack_require__(7);
+	var GridSettings = __webpack_require__(8);
+	var GridNoData = __webpack_require__(9);
+	var CustomRowComponentContainer = __webpack_require__(10);
+	var CustomPaginationContainer = __webpack_require__(11);
+	var ColumnProperties = __webpack_require__(12);
+	var RowProperties = __webpack_require__(13);
+	var _ = __webpack_require__(16);
+
+	var Griddle = React.createClass({
+	    displayName: "Griddle",
+	    columnSettings: null,
+	    rowSettings: null,
+	    getDefaultProps: function () {
+	        return {
+	            columns: [],
+	            columnMetadata: [],
+	            rowMetadata: null,
+	            resultsPerPage: 5,
+	            results: [], // Used if all results are already loaded.
+	            initialSort: "",
+	            initialSortAscending: true,
+	            gridClassName: "",
+	            tableClassName: "",
+	            customRowComponentClassName: "",
+	            settingsText: "Settings",
+	            filterPlaceholderText: "Filter Results",
+	            nextText: "Next",
+	            previousText: "Previous",
+	            maxRowsText: "Rows per page",
+	            enableCustomFormatText: "Enable Custom Formatting",
+	            //this column will determine which column holds subgrid data
+	            //it will be passed through with the data object but will not be rendered
+	            childrenColumnName: "children",
+	            //Any column in this list will be treated as metadata and will be passed through with the data but won't be rendered
+	            metadataColumns: [],
+	            showFilter: false,
+	            showSettings: false,
+	            useCustomRowComponent: false,
+	            useCustomGridComponent: false,
+	            useCustomPagerComponent: false,
+	            useGriddleStyles: true,
+	            useGriddleIcons: true,
+	            customRowComponent: null,
+	            customGridComponent: null,
+	            customPagerComponent: {},
+	            enableToggleCustom: false,
+	            noDataMessage: "There is no data to display.",
+	            noDataClassName: "griddle-nodata",
+	            customNoDataComponent: null,
+	            showTableHeading: true,
+	            showPager: true,
+	            useFixedHeader: false,
+	            useExternal: false,
+	            externalSetPage: null,
+	            externalChangeSort: null,
+	            externalSetFilter: null,
+	            externalSetPageSize: null,
+	            externalMaxPage: null,
+	            externalCurrentPage: null,
+	            externalSortColumn: null,
+	            externalSortAscending: true,
+	            externalLoadingComponent: null,
+	            externalIsLoading: false,
+	            enableInfiniteScroll: false,
+	            bodyHeight: null,
+	            paddingHeight: 5,
+	            rowHeight: 25,
+	            infiniteScrollLoadTreshold: 50,
+	            useFixedLayout: true,
+	            isSubGriddle: false,
+	            enableSort: true,
+	            /* css class names */
+	            sortAscendingClassName: "sort-ascending",
+	            sortDescendingClassName: "sort-descending",
+	            parentRowCollapsedClassName: "parent-row",
+	            parentRowExpandedClassName: "parent-row expanded",
+	            settingsToggleClassName: "settings",
+	            nextClassName: "griddle-next",
+	            previousClassName: "griddle-previous",
+	            headerStyles: {},
+	            /* icon components */
+	            sortAscendingComponent: " ▲",
+	            sortDescendingComponent: " ▼",
+	            parentRowCollapsedComponent: "▶",
+	            parentRowExpandedComponent: "▼",
+	            settingsIconComponent: "",
+	            nextIconComponent: "",
+	            previousIconComponent: ""
+	        };
+	    },
+	    /* if we have a filter display the max page and results accordingly */
+	    setFilter: function (filter) {
+	        if (this.props.useExternal) {
+	            this.props.externalSetFilter(filter);
+	            return;
+	        }
+
+	        var that = this,
+	            updatedState = {
+	            page: 0,
+	            filter: filter
+	        };
+
+	        // Obtain the state results.
+	        updatedState.filteredResults = _.filter(this.props.results, function (item) {
+	            var arr = _.values(item);
+	            for (var i = 0; i < arr.length; i++) {
+	                if ((arr[i] || "").toString().toLowerCase().indexOf(filter.toLowerCase()) >= 0) {
+	                    return true;
+	                }
+	            }
+
+	            return false;
+	        });
+
+	        // Update the max page.
+	        updatedState.maxPage = that.getMaxPage(updatedState.filteredResults);
+
+	        //if filter is null or undefined reset the filter.
+	        if (_.isUndefined(filter) || _.isNull(filter) || _.isEmpty(filter)) {
+	            updatedState.filter = filter;
+	            updatedState.filteredResults = null;
+	        }
+
+	        // Set the state.
+	        that.setState(updatedState);
+	    },
+	    setPageSize: function (size) {
+	        if (this.props.useExternal) {
+	            this.props.externalSetPageSize(size);
+	            return;
+	        }
+
+	        //make this better.
+	        this.props.resultsPerPage = size;
+	        this.setMaxPage();
+	    },
+	    toggleColumnChooser: function () {
+	        this.setState({
+	            showColumnChooser: !this.state.showColumnChooser
+	        });
+	    },
+	    toggleCustomComponent: function () {
+	        if (this.state.customComponentType === "grid") {
+	            this.setProps({
+	                useCustomGridComponent: !this.props.useCustomGridComponent
+	            });
+	        } else if (this.state.customComponentType === "row") {
+	            this.setProps({
+	                useCustomRowComponent: !this.props.useCustomRowComponent
+	            });
+	        }
+	    },
+	    getMaxPage: function (results, totalResults) {
+	        if (this.props.useExternal) {
+	            return this.props.externalMaxPage;
+	        }
+
+	        if (!totalResults) {
+	            totalResults = (results || this.getCurrentResults()).length;
+	        }
+	        var maxPage = Math.ceil(totalResults / this.props.resultsPerPage);
+	        return maxPage;
+	    },
+	    setMaxPage: function (results) {
+	        var maxPage = this.getMaxPage(results);
+	        //re-render if we have new max page value
+	        if (this.state.maxPage !== maxPage) {
+	            this.setState({ page: 0, maxPage: maxPage, filteredColumns: this.columnSettings.filteredColumns });
+	        }
+	    },
+	    setPage: function (number) {
+	        if (this.props.useExternal) {
+	            this.props.externalSetPage(number);
+	            return;
+	        }
+
+	        //check page size and move the filteredResults to pageSize * pageNumber
+	        if (number * this.props.resultsPerPage <= this.props.resultsPerPage * this.state.maxPage) {
+	            var that = this,
+	                state = {
+	                page: number
+	            };
+
+	            that.setState(state);
+	        }
+	    },
+	    setColumns: function (columns) {
+	        this.columnSettings.filteredColumns = _.isArray(columns) ? columns : [columns];
+
+	        this.setState({
+	            filteredColumns: this.columnSettings.filteredColumns
+	        });
+	    },
+	    nextPage: function () {
+	        var currentPage = this.getCurrentPage();
+	        if (currentPage < this.getCurrentMaxPage() - 1) {
+	            this.setPage(currentPage + 1);
+	        }
+	    },
+	    previousPage: function () {
+	        var currentPage = this.getCurrentPage();
+	        if (currentPage > 0) {
+	            this.setPage(currentPage - 1);
+	        }
+	    },
+	    changeSort: function (sort) {
+	        if (this.props.enableSort === false) {
+	            return;
+	        }
+	        if (this.props.useExternal) {
+	            this.props.externalChangeSort(sort, this.props.externalSortColumn === sort ? !this.props.externalSortAscending : true);
+	            return;
+	        }
+
+	        var that = this,
+	            state = {
+	            page: 0,
+	            sortColumn: sort,
+	            sortAscending: true
+	        };
+
+	        // If this is the same column, reverse the sort.
+	        if (this.state.sortColumn == sort) {
+	            state.sortAscending = !this.state.sortAscending;
+	        }
+
+	        this.setState(state);
+	    },
+	    componentWillReceiveProps: function (nextProps) {
+	        this.setMaxPage(nextProps.results);
+	    },
+	    getInitialState: function () {
+	        var state = {
+	            maxPage: 0,
+	            page: 0,
+	            filteredResults: null,
+	            filteredColumns: [],
+	            filter: "",
+	            sortColumn: this.props.initialSort,
+	            sortAscending: this.props.initialSortAscending,
+	            showColumnChooser: false
+	        };
+
+	        return state;
+	    },
+	    componentWillMount: function () {
+	        this.verifyExternal();
+	        this.verifyCustom();
+
+	        this.columnSettings = new ColumnProperties(this.props.results.length > 0 ? _.keys(this.props.results[0]) : [], this.props.columns, this.props.childrenColumnName, this.props.columnMetadata, this.props.metadataColumns);
+
+	        this.rowSettings = new RowProperties(this.props.rowMetadata);
+
+	        this.setMaxPage();
+
+	        //don't like the magic strings
+	        if (this.props.useCustomGridComponent === true) {
+	            this.setState({
+	                customComponentType: "grid"
+	            });
+	        } else if (this.props.useCustomRowComponent === true) {
+	            this.setState({
+	                customComponentType: "row"
+	            });
+	        } else {
+	            this.setState({
+	                filteredColumns: this.columnSettings.filteredColumns
+	            });
+	        }
+	    },
+	    //todo: clean these verify methods up
+	    verifyExternal: function () {
+	        if (this.props.useExternal === true) {
+	            //hooray for big ugly nested if
+	            if (this.props.externalSetPage === null) {
+	                console.error("useExternal is set to true but there is no externalSetPage function specified.");
+	            }
+
+	            if (this.props.externalChangeSort === null) {
+	                console.error("useExternal is set to true but there is no externalChangeSort function specified.");
+	            }
+
+	            if (this.props.externalSetFilter === null) {
+	                console.error("useExternal is set to true but there is no externalSetFilter function specified.");
+	            }
+
+	            if (this.props.externalSetPageSize === null) {
+	                console.error("useExternal is set to true but there is no externalSetPageSize function specified.");
+	            }
+
+	            if (this.props.externalMaxPage === null) {
+	                console.error("useExternal is set to true but externalMaxPage is not set.");
+	            }
+
+	            if (this.props.externalCurrentPage === null) {
+	                console.error("useExternal is set to true but externalCurrentPage is not set. Griddle will not page correctly without that property when using external data.");
+	            }
+	        }
+	    },
+	    verifyCustom: function () {
+	        if (this.props.useCustomGridComponent === true && this.props.customGridComponent === null) {
+	            console.error("useCustomGridComponent is set to true but no custom component was specified.");
+	        }
+	        if (this.props.useCustomRowComponent === true && this.props.customRowComponent === null) {
+	            console.error("useCustomRowComponent is set to true but no custom component was specified.");
+	        }
+	        if (this.props.useCustomGridComponent === true && this.props.useCustomRowComponent === true) {
+	            console.error("Cannot currently use both customGridComponent and customRowComponent.");
+	        }
+	    },
+	    getDataForRender: function (data, cols, pageList) {
+	        var that = this;
+	        //get the correct page size
+	        if (this.state.sortColumn !== "" || this.props.initialSort !== "") {
+	            var sortProperty = _.where(this.props.columnMetadata, { columnName: this.state.sortColumn });
+	            sortProperty = sortProperty.length > 0 && sortProperty[0].hasOwnProperty("sortProperty") && sortProperty[0].sortProperty || null;
+
+	            data = _.sortBy(data, function (item) {
+	                return sortProperty ? item[that.state.sortColumn || that.props.initialSort][sortProperty] : item[that.state.sortColumn || that.props.initialSort];
+	            });
+
+	            if (this.state.sortAscending === false) {
+	                data.reverse();
+	            }
+	        }
+
+	        var currentPage = this.getCurrentPage();
+
+	        if (!this.props.useExternal && pageList && this.props.resultsPerPage * (currentPage + 1) <= this.props.resultsPerPage * this.state.maxPage && currentPage >= 0) {
+	            if (this.isInfiniteScrollEnabled()) {
+	                // If we're doing infinite scroll, grab all results up to the current page.
+	                data = _.first(data, (currentPage + 1) * this.props.resultsPerPage);
+	            } else {
+	                //the 'rest' is grabbing the whole array from index on and the 'initial' is getting the first n results
+	                var rest = _.rest(data, currentPage * this.props.resultsPerPage);
+	                data = _.initial(rest, rest.length - this.props.resultsPerPage);
+	            }
+	        }
+
+	        var meta = this.columnSettings.getMetadataColumns;
+
+	        var transformedData = [];
+
+	        for (var i = 0; i < data.length; i++) {
+	            var mappedData = data[i];
+
+	            if (typeof mappedData[that.props.childrenColumnName] !== "undefined" && mappedData[that.props.childrenColumnName].length > 0) {
+	                //internally we're going to use children instead of whatever it is so we don't have to pass the custom name around
+	                mappedData.children = that.getDataForRender(mappedData[that.props.childrenColumnName], cols, false);
+
+	                if (that.props.childrenColumnName !== "children") {
+	                    delete mappedData[that.props.childrenColumnName];
+	                }
+	            }
+
+	            transformedData.push(mappedData);
+	        }
+	        return transformedData;
+	    },
+	    //this is the current results
+	    getCurrentResults: function () {
+	        return this.state.filteredResults || this.props.results;
+	    },
+	    getCurrentPage: function () {
+	        return this.props.externalCurrentPage || this.state.page;
+	    },
+	    getCurrentSort: function () {
+	        return this.props.useExternal ? this.props.externalSortColumn : this.state.sortColumn;
+	    },
+	    getCurrentSortAscending: function () {
+	        return this.props.useExternal ? this.props.externalSortAscending : this.state.sortAscending;
+	    },
+	    getCurrentMaxPage: function () {
+	        return this.props.useExternal ? this.props.externalMaxPage : this.state.maxPage;
+	    },
+	    //This takes the props relating to sort and puts them in one object
+	    getSortObject: function () {
+	        return {
+	            enableSort: this.props.enableSort,
+	            changeSort: this.changeSort,
+	            sortColumn: this.getCurrentSort(),
+	            sortAscending: this.getCurrentSortAscending(),
+	            sortAscendingClassName: this.props.sortAscendingClassName,
+	            sortDescendingClassName: this.props.sortDescendingClassName,
+	            sortAscendingComponent: this.props.sortAscendingComponent,
+	            sortDescendingComponent: this.props.sortDescendingComponent
+	        };
+	    },
+	    isInfiniteScrollEnabled: function () {
+	        // If a custom pager is included, don't allow for infinite scrolling.
+	        if (this.props.useCustomPagerComponent) {
+	            return false;
+	        }
+
+	        // Otherwise, send back the property.
+	        return this.props.enableInfiniteScroll;
+	    },
+	    getClearFixStyles: function () {
+	        return {
+	            clear: "both",
+	            display: "table",
+	            width: "100%"
+	        };
+	    },
+	    getSettingsStyles: function () {
+	        return {
+	            float: "left",
+	            width: "50%",
+	            textAlign: "right"
+	        };
+	    },
+	    getFilterStyles: function () {
+	        return {
+	            float: "left",
+	            width: "50%",
+	            textAlign: "left",
+	            color: "#222",
+	            minHeight: "1px"
+	        };
+	    },
+	    getFilter: function () {
+	        return this.props.showFilter && this.props.useCustomGridComponent === false ? React.createElement(GridFilter, { changeFilter: this.setFilter, placeholderText: this.props.filterPlaceholderText }) : "";
+	    },
+	    getSettings: function () {
+	        return this.props.showSettings ? React.createElement(
+	            "button",
+	            { type: "button", className: this.props.settingsToggleClassName, onClick: this.toggleColumnChooser,
+	                style: this.props.useGriddleStyles ? { background: "none", border: "none", padding: 0, margin: 0, fontSize: 14 } : null },
+	            this.props.settingsText,
+	            this.props.settingsIconComponent
+	        ) : "";
+	    },
+	    getTopSection: function (filter, settings) {
+	        if (this.props.showFilter === false && this.props.showSettings === false) {
+	            return "";
+	        }
+
+	        var filterStyles = null,
+	            settingsStyles = null,
+	            topContainerStyles = null;
+
+	        if (this.props.useGriddleStyles) {
+	            filterStyles = this.getFilterStyles();
+	            settingsStyles = this.getSettingsStyles();
+
+	            topContainerStyles = this.getClearFixStyles();
+	        }
+
+	        return React.createElement(
+	            "div",
+	            { className: "top-section", style: topContainerStyles },
+	            React.createElement(
+	                "div",
+	                { className: "griddle-filter", style: filterStyles },
+	                filter
+	            ),
+	            React.createElement(
+	                "div",
+	                { className: "griddle-settings-toggle", style: settingsStyles },
+	                settings
+	            )
+	        );
+	    },
+	    getPagingSection: function (currentPage, maxPage) {
+	        if ((this.props.showPager && !this.isInfiniteScrollEnabled() && !this.props.useCustomGridComponent) === false) {
+	            return "";
+	        }
+
+	        return React.createElement(
+	            "div",
+	            { className: "griddle-footer" },
+	            this.props.useCustomPagerComponent ? React.createElement(CustomPaginationContainer, { next: this.nextPage, previous: this.previousPage, currentPage: currentPage, maxPage: maxPage, setPage: this.setPage, nextText: this.props.nextText, previousText: this.props.previousText, customPagerComponent: this.props.customPagerComponent }) : React.createElement(GridPagination, { useGriddleStyles: this.props.useGriddleStyles, next: this.nextPage, previous: this.previousPage, nextClassName: this.props.nextClassName, nextIconComponent: this.props.nextIconComponent, previousClassName: this.props.previousClassName, previousIconComponent: this.props.previousIconComponent, currentPage: currentPage, maxPage: maxPage, setPage: this.setPage, nextText: this.props.nextText, previousText: this.props.previousText })
+	        );
+	    },
+	    getColumnSelectorSection: function (keys, cols) {
+	        return this.state.showColumnChooser ? React.createElement(GridSettings, { columns: keys, selectedColumns: cols, setColumns: this.setColumns, settingsText: this.props.settingsText,
+	            settingsIconComponent: this.props.settingsIconComponent, maxRowsText: this.props.maxRowsText, setPageSize: this.setPageSize,
+	            showSetPageSize: !this.props.useCustomGridComponent, resultsPerPage: this.props.resultsPerPage, enableToggleCustom: this.props.enableToggleCustom,
+	            toggleCustomComponent: this.toggleCustomComponent, useCustomComponent: this.props.useCustomRowComponent || this.props.useCustomGridComponent,
+	            useGriddleStyles: this.props.useGriddleStyles, enableCustomFormatText: this.props.enableCustomFormatText, columnMetadata: this.props.columnMetadata }) : "";
+	    },
+	    getCustomGridSection: function () {
+	        return React.createElement(this.props.customGridComponent, { data: this.props.results, className: this.props.customGridComponentClassName });
+	    },
+	    getCustomRowSection: function (data, cols, meta, pagingContent) {
+	        return React.createElement(
+	            "div",
+	            null,
+	            React.createElement(CustomRowComponentContainer, { data: data, columns: cols, metadataColumns: meta,
+	                className: this.props.customRowComponentClassName, customComponent: this.props.customRowComponent,
+	                style: this.getClearFixStyles() }),
+	            this.props.showPager && pagingContent
+	        );
+	    },
+	    getStandardGridSection: function (data, cols, meta, pagingContent, hasMorePages) {
+	        var sortProperties = this.getSortObject();
+
+	        return React.createElement(
+	            "div",
+	            { className: "griddle-body" },
+	            React.createElement(GridTable, { useGriddleStyles: this.props.useGriddleStyles,
+	                columnSettings: this.columnSettings,
+	                rowSettings: this.rowSettings,
+	                sortSettings: sortProperties,
+	                isSubGriddle: this.props.isSubGriddle,
+	                useGriddleIcons: this.props.useGriddleIcons,
+	                useFixedLayout: this.props.useFixedLayout,
+	                showPager: this.props.showPager,
+	                pagingContent: pagingContent,
+	                data: data,
+	                className: this.props.tableClassName,
+	                enableInfiniteScroll: this.isInfiniteScrollEnabled(),
+	                nextPage: this.nextPage,
+	                showTableHeading: this.props.showTableHeading,
+	                useFixedHeader: this.props.useFixedHeader,
+	                parentRowCollapsedClassName: this.props.parentRowCollapsedClassName,
+	                parentRowExpandedClassName: this.props.parentRowExpandedClassName,
+	                parentRowCollapsedComponent: this.props.parentRowCollapsedComponent,
+	                parentRowExpandedComponent: this.props.parentRowExpandedComponent,
+	                bodyHeight: this.props.bodyHeight,
+	                paddingHeight: this.props.paddingHeight,
+	                rowHeight: this.props.rowHeight,
+	                infiniteScrollLoadTreshold: this.props.infiniteScrollLoadTreshold,
+	                externalLoadingComponent: this.props.externalLoadingComponent,
+	                externalIsLoading: this.props.externalIsLoading,
+	                hasMorePages: hasMorePages })
+	        );
+	    },
+	    getContentSection: function (data, cols, meta, pagingContent, hasMorePages) {
+	        if (this.props.useCustomGridComponent && this.props.customGridComponent !== null) {
+	            return this.getCustomGridSection();
+	        } else if (this.props.useCustomRowComponent) {
+	            return this.getCustomRowSection(data, cols, meta, pagingContent);
+	        } else {
+	            return this.getStandardGridSection(data, cols, meta, pagingContent, hasMorePages);
+	        }
+	    },
+	    getNoDataSection: function (gridClassName, topSection) {
+	        var myReturn = null;
+	        if (this.props.customNoDataComponent != null) {
+	            myReturn = React.createElement(
+	                "div",
+	                { className: gridClassName },
+	                React.createElement(this.props.customNoDataComponent, null)
+	            );
+
+	            return myReturn;
+	        }
+
+	        myReturn = React.createElement(
+	            "div",
+	            { className: gridClassName },
+	            topSection,
+	            React.createElement(GridNoData, { noDataMessage: this.props.noDataMessage })
+	        );
+	        return myReturn;
+	    },
+	    shouldShowNoDataSection: function (results) {
+	        return this.props.useExternal === false && (typeof results === "undefined" || results.length === 0) || this.props.useExternal === true && this.props.externalIsLoading === false && results.length === 0;
+	    },
+	    render: function () {
+	        var that = this,
+	            results = this.getCurrentResults(); // Attempt to assign to the filtered results, if we have any.
+
+	        var headerTableClassName = this.props.tableClassName + " table-header";
+
+	        //figure out if we want to show the filter section
+	        var filter = this.getFilter();
+	        var settings = this.getSettings();
+
+	        //if we have neither filter or settings don't need to render this stuff
+	        var topSection = this.getTopSection(filter, settings);
+
+	        var keys = [];
+	        var cols = this.columnSettings.getColumns();
+
+	        //figure out which columns are displayed and show only those
+	        var data = this.getDataForRender(results, cols, true);
+
+	        var meta = this.columnSettings.getMetadataColumns();
+
+	        // Grab the column keys from the first results
+	        keys = _.keys(_.omit(results[0], meta));
+
+	        // sort keys by order
+	        keys = this.columnSettings.orderColumns(keys);
+
+	        // Grab the current and max page values.
+	        var currentPage = this.getCurrentPage();
+	        var maxPage = this.getCurrentMaxPage();
+
+	        // Determine if we need to enable infinite scrolling on the table.
+	        var hasMorePages = currentPage + 1 < maxPage;
+
+	        // Grab the paging content if it's to be displayed
+	        var pagingContent = this.getPagingSection(currentPage, maxPage);
+
+	        var resultContent = this.getContentSection(data, cols, meta, pagingContent, hasMorePages);
+
+	        var columnSelector = this.getColumnSelectorSection(keys, cols);
+
+	        var gridClassName = this.props.gridClassName.length > 0 ? "griddle " + this.props.gridClassName : "griddle";
+	        //add custom to the class name so we can style it differently
+	        gridClassName += this.props.useCustomRowComponent ? " griddle-custom" : "";
+
+	        if (this.shouldShowNoDataSection(results)) {
+	            gridClassName += this.props.noDataClassName && this.props.noDataClassName.length > 0 ? " " + this.props.noDataClassName : "";
+	            return this.getNoDataSection(gridClassName, topSection);
+	        }
+
+	        return React.createElement(
+	            "div",
+	            { className: gridClassName },
+	            topSection,
+	            columnSelector,
+	            React.createElement(
+	                "div",
+	                { className: "griddle-container", style: this.props.useGriddleStyles && !this.props.isSubGriddle ? { border: "1px solid #DDD" } : null },
+	                resultContent
+	            )
+	        );
+	    }
+	});
+
+	module.exports = Griddle;
+
+/***/ },
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -9482,650 +10075,6 @@
 
 
 /***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	/*
-	   Griddle - Simple Grid Component for React
-	   https://github.com/DynamicTyped/Griddle
-	   Copyright (c) 2014 Ryan Lanciaux | DynamicTyped
-
-	   See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
-	*/
-	var React = __webpack_require__(2);
-	var GridTable = __webpack_require__(5);
-	var GridFilter = __webpack_require__(6);
-	var GridPagination = __webpack_require__(7);
-	var GridSettings = __webpack_require__(8);
-	var GridNoData = __webpack_require__(9);
-	var CustomRowComponentContainer = __webpack_require__(10);
-	var CustomPaginationContainer = __webpack_require__(11);
-	var ColumnProperties = __webpack_require__(12);
-	var RowProperties = __webpack_require__(13);
-	var _ = __webpack_require__(16);
-
-	var Griddle = React.createClass({
-	    displayName: "Griddle",
-	    columnSettings: null,
-	    rowSettings: null,
-	    getDefaultProps: function () {
-	        return {
-	            columns: [],
-	            columnMetadata: [],
-	            rowMetadata: null,
-	            resultsPerPage: 5,
-	            results: [], // Used if all results are already loaded.
-	            initialSort: "",
-	            initialSortAscending: true,
-	            gridClassName: "",
-	            tableClassName: "",
-	            customRowComponentClassName: "",
-	            settingsText: "Settings",
-	            filterPlaceholderText: "Filter Results",
-	            nextText: "Next",
-	            previousText: "Previous",
-	            maxRowsText: "Rows per page",
-	            enableCustomFormatText: "Enable Custom Formatting",
-	            //this column will determine which column holds subgrid data
-	            //it will be passed through with the data object but will not be rendered
-	            childrenColumnName: "children",
-	            //Any column in this list will be treated as metadata and will be passed through with the data but won't be rendered
-	            metadataColumns: [],
-	            showFilter: false,
-	            showSettings: false,
-	            useCustomRowComponent: false,
-	            useCustomGridComponent: false,
-	            useCustomPagerComponent: false,
-	            useGriddleStyles: true,
-	            useGriddleIcons: true,
-	            customRowComponent: null,
-	            customGridComponent: null,
-	            customPagerComponent: {},
-	            enableToggleCustom: false,
-	            noDataMessage: "There is no data to display.",
-	            noDataClassName: "griddle-nodata",
-	            customNoDataComponent: null,
-	            showTableHeading: true,
-	            showPager: true,
-	            useFixedHeader: false,
-	            useExternal: false,
-	            externalSetPage: null,
-	            externalChangeSort: null,
-	            externalSetFilter: null,
-	            externalSetPageSize: null,
-	            externalMaxPage: null,
-	            externalCurrentPage: null,
-	            externalSortColumn: null,
-	            externalSortAscending: true,
-	            externalLoadingComponent: null,
-	            externalIsLoading: false,
-	            enableInfiniteScroll: false,
-	            bodyHeight: null,
-	            paddingHeight: 5,
-	            rowHeight: 25,
-	            infiniteScrollLoadTreshold: 50,
-	            useFixedLayout: true,
-	            isSubGriddle: false,
-	            enableSort: true,
-	            /* css class names */
-	            sortAscendingClassName: "sort-ascending",
-	            sortDescendingClassName: "sort-descending",
-	            parentRowCollapsedClassName: "parent-row",
-	            parentRowExpandedClassName: "parent-row expanded",
-	            settingsToggleClassName: "settings",
-	            nextClassName: "griddle-next",
-	            previousClassName: "griddle-previous",
-	            headerStyles: {},
-	            /* icon components */
-	            sortAscendingComponent: " ▲",
-	            sortDescendingComponent: " ▼",
-	            parentRowCollapsedComponent: "▶",
-	            parentRowExpandedComponent: "▼",
-	            settingsIconComponent: "",
-	            nextIconComponent: "",
-	            previousIconComponent: ""
-	        };
-	    },
-	    /* if we have a filter display the max page and results accordingly */
-	    setFilter: function (filter) {
-	        if (this.props.useExternal) {
-	            this.props.externalSetFilter(filter);
-	            return;
-	        }
-
-	        var that = this,
-	            updatedState = {
-	            page: 0,
-	            filter: filter
-	        };
-
-	        // Obtain the state results.
-	        updatedState.filteredResults = _.filter(this.props.results, function (item) {
-	            var arr = _.values(item);
-	            for (var i = 0; i < arr.length; i++) {
-	                if ((arr[i] || "").toString().toLowerCase().indexOf(filter.toLowerCase()) >= 0) {
-	                    return true;
-	                }
-	            }
-
-	            return false;
-	        });
-
-	        // Update the max page.
-	        updatedState.maxPage = that.getMaxPage(updatedState.filteredResults);
-
-	        //if filter is null or undefined reset the filter.
-	        if (_.isUndefined(filter) || _.isNull(filter) || _.isEmpty(filter)) {
-	            updatedState.filter = filter;
-	            updatedState.filteredResults = null;
-	        }
-
-	        // Set the state.
-	        that.setState(updatedState);
-	    },
-	    setPageSize: function (size) {
-	        if (this.props.useExternal) {
-	            this.props.externalSetPageSize(size);
-	            return;
-	        }
-
-	        //make this better.
-	        this.props.resultsPerPage = size;
-	        this.setMaxPage();
-	    },
-	    toggleColumnChooser: function () {
-	        this.setState({
-	            showColumnChooser: !this.state.showColumnChooser
-	        });
-	    },
-	    toggleCustomComponent: function () {
-	        if (this.state.customComponentType === "grid") {
-	            this.setProps({
-	                useCustomGridComponent: !this.props.useCustomGridComponent
-	            });
-	        } else if (this.state.customComponentType === "row") {
-	            this.setProps({
-	                useCustomRowComponent: !this.props.useCustomRowComponent
-	            });
-	        }
-	    },
-	    getMaxPage: function (results, totalResults) {
-	        if (this.props.useExternal) {
-	            return this.props.externalMaxPage;
-	        }
-
-	        if (!totalResults) {
-	            totalResults = (results || this.getCurrentResults()).length;
-	        }
-	        var maxPage = Math.ceil(totalResults / this.props.resultsPerPage);
-	        return maxPage;
-	    },
-	    setMaxPage: function (results) {
-	        var maxPage = this.getMaxPage(results);
-	        //re-render if we have new max page value
-	        if (this.state.maxPage !== maxPage) {
-	            this.setState({ page: 0, maxPage: maxPage, filteredColumns: this.columnSettings.filteredColumns });
-	        }
-	    },
-	    setPage: function (number) {
-	        if (this.props.useExternal) {
-	            this.props.externalSetPage(number);
-	            return;
-	        }
-
-	        //check page size and move the filteredResults to pageSize * pageNumber
-	        if (number * this.props.resultsPerPage <= this.props.resultsPerPage * this.state.maxPage) {
-	            var that = this,
-	                state = {
-	                page: number
-	            };
-
-	            that.setState(state);
-	        }
-	    },
-	    setColumns: function (columns) {
-	        this.columnSettings.filteredColumns = _.isArray(columns) ? columns : [columns];
-
-	        this.setState({
-	            filteredColumns: this.columnSettings.filteredColumns
-	        });
-	    },
-	    nextPage: function () {
-	        var currentPage = this.getCurrentPage();
-	        if (currentPage < this.getCurrentMaxPage() - 1) {
-	            this.setPage(currentPage + 1);
-	        }
-	    },
-	    previousPage: function () {
-	        var currentPage = this.getCurrentPage();
-	        if (currentPage > 0) {
-	            this.setPage(currentPage - 1);
-	        }
-	    },
-	    changeSort: function (sort) {
-	        if (this.props.enableSort === false) {
-	            return;
-	        }
-	        if (this.props.useExternal) {
-	            this.props.externalChangeSort(sort, this.props.externalSortColumn === sort ? !this.props.externalSortAscending : true);
-	            return;
-	        }
-
-	        var that = this,
-	            state = {
-	            page: 0,
-	            sortColumn: sort,
-	            sortAscending: true
-	        };
-
-	        // If this is the same column, reverse the sort.
-	        if (this.state.sortColumn == sort) {
-	            state.sortAscending = !this.state.sortAscending;
-	        }
-
-	        this.setState(state);
-	    },
-	    componentWillReceiveProps: function (nextProps) {
-	        this.setMaxPage(nextProps.results);
-	    },
-	    getInitialState: function () {
-	        var state = {
-	            maxPage: 0,
-	            page: 0,
-	            filteredResults: null,
-	            filteredColumns: [],
-	            filter: "",
-	            sortColumn: this.props.initialSort,
-	            sortAscending: this.props.initialSortAscending,
-	            showColumnChooser: false
-	        };
-
-	        return state;
-	    },
-	    componentWillMount: function () {
-	        this.verifyExternal();
-	        this.verifyCustom();
-
-	        this.columnSettings = new ColumnProperties(this.props.results.length > 0 ? _.keys(this.props.results[0]) : [], this.props.columns, this.props.childrenColumnName, this.props.columnMetadata, this.props.metadataColumns);
-
-	        this.rowSettings = new RowProperties(this.props.rowMetadata);
-
-	        this.setMaxPage();
-
-	        //don't like the magic strings
-	        if (this.props.useCustomGridComponent === true) {
-	            this.setState({
-	                customComponentType: "grid"
-	            });
-	        } else if (this.props.useCustomRowComponent === true) {
-	            this.setState({
-	                customComponentType: "row"
-	            });
-	        } else {
-	            this.setState({
-	                filteredColumns: this.columnSettings.filteredColumns
-	            });
-	        }
-	    },
-	    //todo: clean these verify methods up
-	    verifyExternal: function () {
-	        if (this.props.useExternal === true) {
-	            //hooray for big ugly nested if
-	            if (this.props.externalSetPage === null) {
-	                console.error("useExternal is set to true but there is no externalSetPage function specified.");
-	            }
-
-	            if (this.props.externalChangeSort === null) {
-	                console.error("useExternal is set to true but there is no externalChangeSort function specified.");
-	            }
-
-	            if (this.props.externalSetFilter === null) {
-	                console.error("useExternal is set to true but there is no externalSetFilter function specified.");
-	            }
-
-	            if (this.props.externalSetPageSize === null) {
-	                console.error("useExternal is set to true but there is no externalSetPageSize function specified.");
-	            }
-
-	            if (this.props.externalMaxPage === null) {
-	                console.error("useExternal is set to true but externalMaxPage is not set.");
-	            }
-
-	            if (this.props.externalCurrentPage === null) {
-	                console.error("useExternal is set to true but externalCurrentPage is not set. Griddle will not page correctly without that property when using external data.");
-	            }
-	        }
-	    },
-	    verifyCustom: function () {
-	        if (this.props.useCustomGridComponent === true && this.props.customGridComponent === null) {
-	            console.error("useCustomGridComponent is set to true but no custom component was specified.");
-	        }
-	        if (this.props.useCustomRowComponent === true && this.props.customRowComponent === null) {
-	            console.error("useCustomRowComponent is set to true but no custom component was specified.");
-	        }
-	        if (this.props.useCustomGridComponent === true && this.props.useCustomRowComponent === true) {
-	            console.error("Cannot currently use both customGridComponent and customRowComponent.");
-	        }
-	    },
-	    getDataForRender: function (data, cols, pageList) {
-	        var that = this;
-	        //get the correct page size
-	        if (this.state.sortColumn !== "" || this.props.initialSort !== "") {
-	            var sortProperty = _.where(this.props.columnMetadata, { columnName: this.state.sortColumn });
-	            sortProperty = sortProperty.length > 0 && sortProperty[0].hasOwnProperty("sortProperty") && sortProperty[0].sortProperty || null;
-
-	            data = _.sortBy(data, function (item) {
-	                return sortProperty ? item[that.state.sortColumn || that.props.initialSort][sortProperty] : item[that.state.sortColumn || that.props.initialSort];
-	            });
-
-	            if (this.state.sortAscending === false) {
-	                data.reverse();
-	            }
-	        }
-
-	        var currentPage = this.getCurrentPage();
-
-	        if (!this.props.useExternal && pageList && this.props.resultsPerPage * (currentPage + 1) <= this.props.resultsPerPage * this.state.maxPage && currentPage >= 0) {
-	            if (this.isInfiniteScrollEnabled()) {
-	                // If we're doing infinite scroll, grab all results up to the current page.
-	                data = _.first(data, (currentPage + 1) * this.props.resultsPerPage);
-	            } else {
-	                //the 'rest' is grabbing the whole array from index on and the 'initial' is getting the first n results
-	                var rest = _.rest(data, currentPage * this.props.resultsPerPage);
-	                data = _.initial(rest, rest.length - this.props.resultsPerPage);
-	            }
-	        }
-
-	        var meta = this.columnSettings.getMetadataColumns;
-
-	        var transformedData = [];
-
-	        for (var i = 0; i < data.length; i++) {
-	            var mappedData = data[i];
-
-	            if (typeof mappedData[that.props.childrenColumnName] !== "undefined" && mappedData[that.props.childrenColumnName].length > 0) {
-	                //internally we're going to use children instead of whatever it is so we don't have to pass the custom name around
-	                mappedData.children = that.getDataForRender(mappedData[that.props.childrenColumnName], cols, false);
-
-	                if (that.props.childrenColumnName !== "children") {
-	                    delete mappedData[that.props.childrenColumnName];
-	                }
-	            }
-
-	            transformedData.push(mappedData);
-	        }
-	        return transformedData;
-	    },
-	    //this is the current results
-	    getCurrentResults: function () {
-	        return this.state.filteredResults || this.props.results;
-	    },
-	    getCurrentPage: function () {
-	        return this.props.externalCurrentPage || this.state.page;
-	    },
-	    getCurrentSort: function () {
-	        return this.props.useExternal ? this.props.externalSortColumn : this.state.sortColumn;
-	    },
-	    getCurrentSortAscending: function () {
-	        return this.props.useExternal ? this.props.externalSortAscending : this.state.sortAscending;
-	    },
-	    getCurrentMaxPage: function () {
-	        return this.props.useExternal ? this.props.externalMaxPage : this.state.maxPage;
-	    },
-	    //This takes the props relating to sort and puts them in one object
-	    getSortObject: function () {
-	        return {
-	            enableSort: this.props.enableSort,
-	            changeSort: this.changeSort,
-	            sortColumn: this.getCurrentSort(),
-	            sortAscending: this.getCurrentSortAscending(),
-	            sortAscendingClassName: this.props.sortAscendingClassName,
-	            sortDescendingClassName: this.props.sortDescendingClassName,
-	            sortAscendingComponent: this.props.sortAscendingComponent,
-	            sortDescendingComponent: this.props.sortDescendingComponent
-	        };
-	    },
-	    isInfiniteScrollEnabled: function () {
-	        // If a custom pager is included, don't allow for infinite scrolling.
-	        if (this.props.useCustomPagerComponent) {
-	            return false;
-	        }
-
-	        // Otherwise, send back the property.
-	        return this.props.enableInfiniteScroll;
-	    },
-	    getClearFixStyles: function () {
-	        return {
-	            clear: "both",
-	            display: "table",
-	            width: "100%"
-	        };
-	    },
-	    getSettingsStyles: function () {
-	        return {
-	            float: "left",
-	            width: "50%",
-	            textAlign: "right"
-	        };
-	    },
-	    getFilterStyles: function () {
-	        return {
-	            float: "left",
-	            width: "50%",
-	            textAlign: "left",
-	            color: "#222",
-	            minHeight: "1px"
-	        };
-	    },
-	    getFilter: function () {
-	        return this.props.showFilter && this.props.useCustomGridComponent === false ? React.createElement(GridFilter, { changeFilter: this.setFilter, placeholderText: this.props.filterPlaceholderText }) : "";
-	    },
-	    getSettings: function () {
-	        return this.props.showSettings ? React.createElement(
-	            "button",
-	            { type: "button", className: this.props.settingsToggleClassName, onClick: this.toggleColumnChooser,
-	                style: this.props.useGriddleStyles ? { background: "none", border: "none", padding: 0, margin: 0, fontSize: 14 } : null },
-	            this.props.settingsText,
-	            this.props.settingsIconComponent
-	        ) : "";
-	    },
-	    getTopSection: function (filter, settings) {
-	        if (this.props.showFilter === false && this.props.showSettings === false) {
-	            return "";
-	        }
-
-	        var filterStyles = null,
-	            settingsStyles = null,
-	            topContainerStyles = null;
-
-	        if (this.props.useGriddleStyles) {
-	            filterStyles = this.getFilterStyles();
-	            settingsStyles = this.getSettingsStyles();
-
-	            topContainerStyles = this.getClearFixStyles();
-	        }
-
-	        return React.createElement(
-	            "div",
-	            { className: "top-section", style: topContainerStyles },
-	            React.createElement(
-	                "div",
-	                { className: "griddle-filter", style: filterStyles },
-	                filter
-	            ),
-	            React.createElement(
-	                "div",
-	                { className: "griddle-settings-toggle", style: settingsStyles },
-	                settings
-	            )
-	        );
-	    },
-	    getPagingSection: function (currentPage, maxPage) {
-	        if ((this.props.showPager && !this.isInfiniteScrollEnabled() && !this.props.useCustomGridComponent) === false) {
-	            return "";
-	        }
-
-	        return React.createElement(
-	            "div",
-	            { className: "griddle-footer" },
-	            this.props.useCustomPagerComponent ? React.createElement(CustomPaginationContainer, { next: this.nextPage, previous: this.previousPage, currentPage: currentPage, maxPage: maxPage, setPage: this.setPage, nextText: this.props.nextText, previousText: this.props.previousText, customPagerComponent: this.props.customPagerComponent }) : React.createElement(GridPagination, { useGriddleStyles: this.props.useGriddleStyles, next: this.nextPage, previous: this.previousPage, nextClassName: this.props.nextClassName, nextIconComponent: this.props.nextIconComponent, previousClassName: this.props.previousClassName, previousIconComponent: this.props.previousIconComponent, currentPage: currentPage, maxPage: maxPage, setPage: this.setPage, nextText: this.props.nextText, previousText: this.props.previousText })
-	        );
-	    },
-	    getColumnSelectorSection: function (keys, cols) {
-	        return this.state.showColumnChooser ? React.createElement(GridSettings, { columns: keys, selectedColumns: cols, setColumns: this.setColumns, settingsText: this.props.settingsText,
-	            settingsIconComponent: this.props.settingsIconComponent, maxRowsText: this.props.maxRowsText, setPageSize: this.setPageSize,
-	            showSetPageSize: !this.props.useCustomGridComponent, resultsPerPage: this.props.resultsPerPage, enableToggleCustom: this.props.enableToggleCustom,
-	            toggleCustomComponent: this.toggleCustomComponent, useCustomComponent: this.props.useCustomRowComponent || this.props.useCustomGridComponent,
-	            useGriddleStyles: this.props.useGriddleStyles, enableCustomFormatText: this.props.enableCustomFormatText, columnMetadata: this.props.columnMetadata }) : "";
-	    },
-	    getCustomGridSection: function () {
-	        return React.createElement(this.props.customGridComponent, { data: this.props.results, className: this.props.customGridComponentClassName });
-	    },
-	    getCustomRowSection: function (data, cols, meta, pagingContent) {
-	        return React.createElement(
-	            "div",
-	            null,
-	            React.createElement(CustomRowComponentContainer, { data: data, columns: cols, metadataColumns: meta,
-	                className: this.props.customRowComponentClassName, customComponent: this.props.customRowComponent,
-	                style: this.getClearFixStyles() }),
-	            this.props.showPager && pagingContent
-	        );
-	    },
-	    getStandardGridSection: function (data, cols, meta, pagingContent, hasMorePages) {
-	        var sortProperties = this.getSortObject();
-
-	        return React.createElement(
-	            "div",
-	            { className: "griddle-body" },
-	            React.createElement(GridTable, { useGriddleStyles: this.props.useGriddleStyles,
-	                columnSettings: this.columnSettings,
-	                rowSettings: this.rowSettings,
-	                sortSettings: sortProperties,
-	                isSubGriddle: this.props.isSubGriddle,
-	                useGriddleIcons: this.props.useGriddleIcons,
-	                useFixedLayout: this.props.useFixedLayout,
-	                showPager: this.props.showPager,
-	                pagingContent: pagingContent,
-	                data: data,
-	                className: this.props.tableClassName,
-	                enableInfiniteScroll: this.isInfiniteScrollEnabled(),
-	                nextPage: this.nextPage,
-	                showTableHeading: this.props.showTableHeading,
-	                useFixedHeader: this.props.useFixedHeader,
-	                parentRowCollapsedClassName: this.props.parentRowCollapsedClassName,
-	                parentRowExpandedClassName: this.props.parentRowExpandedClassName,
-	                parentRowCollapsedComponent: this.props.parentRowCollapsedComponent,
-	                parentRowExpandedComponent: this.props.parentRowExpandedComponent,
-	                bodyHeight: this.props.bodyHeight,
-	                paddingHeight: this.props.paddingHeight,
-	                rowHeight: this.props.rowHeight,
-	                infiniteScrollLoadTreshold: this.props.infiniteScrollLoadTreshold,
-	                externalLoadingComponent: this.props.externalLoadingComponent,
-	                externalIsLoading: this.props.externalIsLoading,
-	                hasMorePages: hasMorePages })
-	        );
-	    },
-	    getContentSection: function (data, cols, meta, pagingContent, hasMorePages) {
-	        if (this.props.useCustomGridComponent && this.props.customGridComponent !== null) {
-	            return this.getCustomGridSection();
-	        } else if (this.props.useCustomRowComponent) {
-	            return this.getCustomRowSection(data, cols, meta, pagingContent);
-	        } else {
-	            return this.getStandardGridSection(data, cols, meta, pagingContent, hasMorePages);
-	        }
-	    },
-	    getNoDataSection: function (gridClassName, topSection) {
-	        var myReturn = null;
-	        if (this.props.customNoDataComponent != null) {
-	            myReturn = React.createElement(
-	                "div",
-	                { className: gridClassName },
-	                React.createElement(this.props.customNoDataComponent, null)
-	            );
-
-	            return myReturn;
-	        }
-
-	        myReturn = React.createElement(
-	            "div",
-	            { className: gridClassName },
-	            topSection,
-	            React.createElement(GridNoData, { noDataMessage: this.props.noDataMessage })
-	        );
-	        return myReturn;
-	    },
-	    shouldShowNoDataSection: function (results) {
-	        return this.props.useExternal === false && (typeof results === "undefined" || results.length === 0) || this.props.useExternal === true && this.props.externalIsLoading === false && results.length === 0;
-	    },
-	    render: function () {
-	        var that = this,
-	            results = this.getCurrentResults(); // Attempt to assign to the filtered results, if we have any.
-
-	        var headerTableClassName = this.props.tableClassName + " table-header";
-
-	        //figure out if we want to show the filter section
-	        var filter = this.getFilter();
-	        var settings = this.getSettings();
-
-	        //if we have neither filter or settings don't need to render this stuff
-	        var topSection = this.getTopSection(filter, settings);
-
-	        var keys = [];
-	        var cols = this.columnSettings.getColumns();
-
-	        //figure out which columns are displayed and show only those
-	        var data = this.getDataForRender(results, cols, true);
-
-	        var meta = this.columnSettings.getMetadataColumns();
-
-	        // Grab the column keys from the first results
-	        keys = _.keys(_.omit(results[0], meta));
-
-	        // sort keys by order
-	        keys = this.columnSettings.orderColumns(keys);
-
-	        // Grab the current and max page values.
-	        var currentPage = this.getCurrentPage();
-	        var maxPage = this.getCurrentMaxPage();
-
-	        // Determine if we need to enable infinite scrolling on the table.
-	        var hasMorePages = currentPage + 1 < maxPage;
-
-	        // Grab the paging content if it's to be displayed
-	        var pagingContent = this.getPagingSection(currentPage, maxPage);
-
-	        var resultContent = this.getContentSection(data, cols, meta, pagingContent, hasMorePages);
-
-	        var columnSelector = this.getColumnSelectorSection(keys, cols);
-
-	        var gridClassName = this.props.gridClassName.length > 0 ? "griddle " + this.props.gridClassName : "griddle";
-	        //add custom to the class name so we can style it differently
-	        gridClassName += this.props.useCustomRowComponent ? " griddle-custom" : "";
-
-	        if (this.shouldShowNoDataSection(results)) {
-	            gridClassName += this.props.noDataClassName && this.props.noDataClassName.length > 0 ? " " + this.props.noDataClassName : "";
-	            return this.getNoDataSection(gridClassName, topSection);
-	        }
-
-	        return React.createElement(
-	            "div",
-	            { className: gridClassName },
-	            topSection,
-	            columnSelector,
-	            React.createElement(
-	                "div",
-	                { className: "griddle-container", style: this.props.useGriddleStyles && !this.props.isSubGriddle ? { border: "1px solid #DDD" } : null },
-	                resultContent
-	            )
-	        );
-	    }
-	});
-
-	module.exports = Griddle;
-
-/***/ },
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -13512,9 +13461,9 @@
 
 	"use strict";
 
-	var PooledClass = __webpack_require__(51);
+	var PooledClass = __webpack_require__(54);
 
-	var traverseAllChildren = __webpack_require__(52);
+	var traverseAllChildren = __webpack_require__(55);
 	var warning = __webpack_require__(48);
 
 	var twoArgumentPooler = PooledClass.twoArgumentPooler;
@@ -13666,12 +13615,12 @@
 	"use strict";
 
 	var ReactElement = __webpack_require__(26);
-	var ReactOwner = __webpack_require__(53);
-	var ReactUpdates = __webpack_require__(54);
+	var ReactOwner = __webpack_require__(51);
+	var ReactUpdates = __webpack_require__(52);
 
 	var assign = __webpack_require__(39);
 	var invariant = __webpack_require__(50);
-	var keyMirror = __webpack_require__(55);
+	var keyMirror = __webpack_require__(53);
 
 	/**
 	 * Every React component is in one of these life cycles.
@@ -14119,17 +14068,17 @@
 	var ReactEmptyComponent = __webpack_require__(56);
 	var ReactErrorUtils = __webpack_require__(57);
 	var ReactLegacyElement = __webpack_require__(32);
-	var ReactOwner = __webpack_require__(53);
+	var ReactOwner = __webpack_require__(51);
 	var ReactPerf = __webpack_require__(35);
 	var ReactPropTransferer = __webpack_require__(58);
 	var ReactPropTypeLocations = __webpack_require__(59);
 	var ReactPropTypeLocationNames = __webpack_require__(60);
-	var ReactUpdates = __webpack_require__(54);
+	var ReactUpdates = __webpack_require__(52);
 
 	var assign = __webpack_require__(39);
 	var instantiateReactComponent = __webpack_require__(61);
 	var invariant = __webpack_require__(50);
-	var keyMirror = __webpack_require__(55);
+	var keyMirror = __webpack_require__(53);
 	var keyOf = __webpack_require__(62);
 	var monitorCodeUse = __webpack_require__(63);
 	var mapObject = __webpack_require__(64);
@@ -20179,7 +20128,7 @@
 
 	"use strict";
 
-	var keyMirror = __webpack_require__(55);
+	var keyMirror = __webpack_require__(53);
 
 	var PropagationPhases = keyMirror({bubbled: null, captured: null});
 
@@ -20300,311 +20249,6 @@
 
 /***/ },
 /* 51 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(process) {/**
-	 * Copyright 2013-2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule PooledClass
-	 */
-
-	"use strict";
-
-	var invariant = __webpack_require__(50);
-
-	/**
-	 * Static poolers. Several custom versions for each potential number of
-	 * arguments. A completely generic pooler is easy to implement, but would
-	 * require accessing the `arguments` object. In each of these, `this` refers to
-	 * the Class itself, not an instance. If any others are needed, simply add them
-	 * here, or in their own files.
-	 */
-	var oneArgumentPooler = function(copyFieldsFrom) {
-	  var Klass = this;
-	  if (Klass.instancePool.length) {
-	    var instance = Klass.instancePool.pop();
-	    Klass.call(instance, copyFieldsFrom);
-	    return instance;
-	  } else {
-	    return new Klass(copyFieldsFrom);
-	  }
-	};
-
-	var twoArgumentPooler = function(a1, a2) {
-	  var Klass = this;
-	  if (Klass.instancePool.length) {
-	    var instance = Klass.instancePool.pop();
-	    Klass.call(instance, a1, a2);
-	    return instance;
-	  } else {
-	    return new Klass(a1, a2);
-	  }
-	};
-
-	var threeArgumentPooler = function(a1, a2, a3) {
-	  var Klass = this;
-	  if (Klass.instancePool.length) {
-	    var instance = Klass.instancePool.pop();
-	    Klass.call(instance, a1, a2, a3);
-	    return instance;
-	  } else {
-	    return new Klass(a1, a2, a3);
-	  }
-	};
-
-	var fiveArgumentPooler = function(a1, a2, a3, a4, a5) {
-	  var Klass = this;
-	  if (Klass.instancePool.length) {
-	    var instance = Klass.instancePool.pop();
-	    Klass.call(instance, a1, a2, a3, a4, a5);
-	    return instance;
-	  } else {
-	    return new Klass(a1, a2, a3, a4, a5);
-	  }
-	};
-
-	var standardReleaser = function(instance) {
-	  var Klass = this;
-	  ("production" !== process.env.NODE_ENV ? invariant(
-	    instance instanceof Klass,
-	    'Trying to release an instance into a pool of a different type.'
-	  ) : invariant(instance instanceof Klass));
-	  if (instance.destructor) {
-	    instance.destructor();
-	  }
-	  if (Klass.instancePool.length < Klass.poolSize) {
-	    Klass.instancePool.push(instance);
-	  }
-	};
-
-	var DEFAULT_POOL_SIZE = 10;
-	var DEFAULT_POOLER = oneArgumentPooler;
-
-	/**
-	 * Augments `CopyConstructor` to be a poolable class, augmenting only the class
-	 * itself (statically) not adding any prototypical fields. Any CopyConstructor
-	 * you give this may have a `poolSize` property, and will look for a
-	 * prototypical `destructor` on instances (optional).
-	 *
-	 * @param {Function} CopyConstructor Constructor that can be used to reset.
-	 * @param {Function} pooler Customizable pooler.
-	 */
-	var addPoolingTo = function(CopyConstructor, pooler) {
-	  var NewKlass = CopyConstructor;
-	  NewKlass.instancePool = [];
-	  NewKlass.getPooled = pooler || DEFAULT_POOLER;
-	  if (!NewKlass.poolSize) {
-	    NewKlass.poolSize = DEFAULT_POOL_SIZE;
-	  }
-	  NewKlass.release = standardReleaser;
-	  return NewKlass;
-	};
-
-	var PooledClass = {
-	  addPoolingTo: addPoolingTo,
-	  oneArgumentPooler: oneArgumentPooler,
-	  twoArgumentPooler: twoArgumentPooler,
-	  threeArgumentPooler: threeArgumentPooler,
-	  fiveArgumentPooler: fiveArgumentPooler
-	};
-
-	module.exports = PooledClass;
-
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(43)))
-
-/***/ },
-/* 52 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(process) {/**
-	 * Copyright 2013-2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule traverseAllChildren
-	 */
-
-	"use strict";
-
-	var ReactElement = __webpack_require__(26);
-	var ReactInstanceHandles = __webpack_require__(31);
-
-	var invariant = __webpack_require__(50);
-
-	var SEPARATOR = ReactInstanceHandles.SEPARATOR;
-	var SUBSEPARATOR = ':';
-
-	/**
-	 * TODO: Test that:
-	 * 1. `mapChildren` transforms strings and numbers into `ReactTextComponent`.
-	 * 2. it('should fail when supplied duplicate key', function() {
-	 * 3. That a single child and an array with one item have the same key pattern.
-	 * });
-	 */
-
-	var userProvidedKeyEscaperLookup = {
-	  '=': '=0',
-	  '.': '=1',
-	  ':': '=2'
-	};
-
-	var userProvidedKeyEscapeRegex = /[=.:]/g;
-
-	function userProvidedKeyEscaper(match) {
-	  return userProvidedKeyEscaperLookup[match];
-	}
-
-	/**
-	 * Generate a key string that identifies a component within a set.
-	 *
-	 * @param {*} component A component that could contain a manual key.
-	 * @param {number} index Index that is used if a manual key is not provided.
-	 * @return {string}
-	 */
-	function getComponentKey(component, index) {
-	  if (component && component.key != null) {
-	    // Explicit key
-	    return wrapUserProvidedKey(component.key);
-	  }
-	  // Implicit key determined by the index in the set
-	  return index.toString(36);
-	}
-
-	/**
-	 * Escape a component key so that it is safe to use in a reactid.
-	 *
-	 * @param {*} key Component key to be escaped.
-	 * @return {string} An escaped string.
-	 */
-	function escapeUserProvidedKey(text) {
-	  return ('' + text).replace(
-	    userProvidedKeyEscapeRegex,
-	    userProvidedKeyEscaper
-	  );
-	}
-
-	/**
-	 * Wrap a `key` value explicitly provided by the user to distinguish it from
-	 * implicitly-generated keys generated by a component's index in its parent.
-	 *
-	 * @param {string} key Value of a user-provided `key` attribute
-	 * @return {string}
-	 */
-	function wrapUserProvidedKey(key) {
-	  return '$' + escapeUserProvidedKey(key);
-	}
-
-	/**
-	 * @param {?*} children Children tree container.
-	 * @param {!string} nameSoFar Name of the key path so far.
-	 * @param {!number} indexSoFar Number of children encountered until this point.
-	 * @param {!function} callback Callback to invoke with each child found.
-	 * @param {?*} traverseContext Used to pass information throughout the traversal
-	 * process.
-	 * @return {!number} The number of children in this subtree.
-	 */
-	var traverseAllChildrenImpl =
-	  function(children, nameSoFar, indexSoFar, callback, traverseContext) {
-	    var nextName, nextIndex;
-	    var subtreeCount = 0;  // Count of children found in the current subtree.
-	    if (Array.isArray(children)) {
-	      for (var i = 0; i < children.length; i++) {
-	        var child = children[i];
-	        nextName = (
-	          nameSoFar +
-	          (nameSoFar ? SUBSEPARATOR : SEPARATOR) +
-	          getComponentKey(child, i)
-	        );
-	        nextIndex = indexSoFar + subtreeCount;
-	        subtreeCount += traverseAllChildrenImpl(
-	          child,
-	          nextName,
-	          nextIndex,
-	          callback,
-	          traverseContext
-	        );
-	      }
-	    } else {
-	      var type = typeof children;
-	      var isOnlyChild = nameSoFar === '';
-	      // If it's the only child, treat the name as if it was wrapped in an array
-	      // so that it's consistent if the number of children grows
-	      var storageName =
-	        isOnlyChild ? SEPARATOR + getComponentKey(children, 0) : nameSoFar;
-	      if (children == null || type === 'boolean') {
-	        // All of the above are perceived as null.
-	        callback(traverseContext, null, storageName, indexSoFar);
-	        subtreeCount = 1;
-	      } else if (type === 'string' || type === 'number' ||
-	                 ReactElement.isValidElement(children)) {
-	        callback(traverseContext, children, storageName, indexSoFar);
-	        subtreeCount = 1;
-	      } else if (type === 'object') {
-	        ("production" !== process.env.NODE_ENV ? invariant(
-	          !children || children.nodeType !== 1,
-	          'traverseAllChildren(...): Encountered an invalid child; DOM ' +
-	          'elements are not valid children of React components.'
-	        ) : invariant(!children || children.nodeType !== 1));
-	        for (var key in children) {
-	          if (children.hasOwnProperty(key)) {
-	            nextName = (
-	              nameSoFar + (nameSoFar ? SUBSEPARATOR : SEPARATOR) +
-	              wrapUserProvidedKey(key) + SUBSEPARATOR +
-	              getComponentKey(children[key], 0)
-	            );
-	            nextIndex = indexSoFar + subtreeCount;
-	            subtreeCount += traverseAllChildrenImpl(
-	              children[key],
-	              nextName,
-	              nextIndex,
-	              callback,
-	              traverseContext
-	            );
-	          }
-	        }
-	      }
-	    }
-	    return subtreeCount;
-	  };
-
-	/**
-	 * Traverses children that are typically specified as `props.children`, but
-	 * might also be specified through attributes:
-	 *
-	 * - `traverseAllChildren(this.props.children, ...)`
-	 * - `traverseAllChildren(this.props.leftPanelChildren, ...)`
-	 *
-	 * The `traverseContext` is an optional argument that is passed through the
-	 * entire traversal. It can be used to store accumulations or anything else that
-	 * the callback might find relevant.
-	 *
-	 * @param {?*} children Children tree object.
-	 * @param {!function} callback To invoke upon traversing each child.
-	 * @param {?*} traverseContext Context for traversal.
-	 * @return {!number} The number of children in this subtree.
-	 */
-	function traverseAllChildren(children, callback, traverseContext) {
-	  if (children == null) {
-	    return 0;
-	  }
-
-	  return traverseAllChildrenImpl(children, '', 0, callback, traverseContext);
-	}
-
-	module.exports = traverseAllChildren;
-
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(43)))
-
-/***/ },
-/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -20763,7 +20407,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(43)))
 
 /***/ },
-/* 54 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -20780,7 +20424,7 @@
 	"use strict";
 
 	var CallbackQueue = __webpack_require__(104);
-	var PooledClass = __webpack_require__(51);
+	var PooledClass = __webpack_require__(54);
 	var ReactCurrentOwner = __webpack_require__(25);
 	var ReactPerf = __webpack_require__(35);
 	var Transaction = __webpack_require__(105);
@@ -21056,7 +20700,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(43)))
 
 /***/ },
-/* 55 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -21110,6 +20754,311 @@
 	};
 
 	module.exports = keyMirror;
+
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(43)))
+
+/***/ },
+/* 54 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {/**
+	 * Copyright 2013-2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule PooledClass
+	 */
+
+	"use strict";
+
+	var invariant = __webpack_require__(50);
+
+	/**
+	 * Static poolers. Several custom versions for each potential number of
+	 * arguments. A completely generic pooler is easy to implement, but would
+	 * require accessing the `arguments` object. In each of these, `this` refers to
+	 * the Class itself, not an instance. If any others are needed, simply add them
+	 * here, or in their own files.
+	 */
+	var oneArgumentPooler = function(copyFieldsFrom) {
+	  var Klass = this;
+	  if (Klass.instancePool.length) {
+	    var instance = Klass.instancePool.pop();
+	    Klass.call(instance, copyFieldsFrom);
+	    return instance;
+	  } else {
+	    return new Klass(copyFieldsFrom);
+	  }
+	};
+
+	var twoArgumentPooler = function(a1, a2) {
+	  var Klass = this;
+	  if (Klass.instancePool.length) {
+	    var instance = Klass.instancePool.pop();
+	    Klass.call(instance, a1, a2);
+	    return instance;
+	  } else {
+	    return new Klass(a1, a2);
+	  }
+	};
+
+	var threeArgumentPooler = function(a1, a2, a3) {
+	  var Klass = this;
+	  if (Klass.instancePool.length) {
+	    var instance = Klass.instancePool.pop();
+	    Klass.call(instance, a1, a2, a3);
+	    return instance;
+	  } else {
+	    return new Klass(a1, a2, a3);
+	  }
+	};
+
+	var fiveArgumentPooler = function(a1, a2, a3, a4, a5) {
+	  var Klass = this;
+	  if (Klass.instancePool.length) {
+	    var instance = Klass.instancePool.pop();
+	    Klass.call(instance, a1, a2, a3, a4, a5);
+	    return instance;
+	  } else {
+	    return new Klass(a1, a2, a3, a4, a5);
+	  }
+	};
+
+	var standardReleaser = function(instance) {
+	  var Klass = this;
+	  ("production" !== process.env.NODE_ENV ? invariant(
+	    instance instanceof Klass,
+	    'Trying to release an instance into a pool of a different type.'
+	  ) : invariant(instance instanceof Klass));
+	  if (instance.destructor) {
+	    instance.destructor();
+	  }
+	  if (Klass.instancePool.length < Klass.poolSize) {
+	    Klass.instancePool.push(instance);
+	  }
+	};
+
+	var DEFAULT_POOL_SIZE = 10;
+	var DEFAULT_POOLER = oneArgumentPooler;
+
+	/**
+	 * Augments `CopyConstructor` to be a poolable class, augmenting only the class
+	 * itself (statically) not adding any prototypical fields. Any CopyConstructor
+	 * you give this may have a `poolSize` property, and will look for a
+	 * prototypical `destructor` on instances (optional).
+	 *
+	 * @param {Function} CopyConstructor Constructor that can be used to reset.
+	 * @param {Function} pooler Customizable pooler.
+	 */
+	var addPoolingTo = function(CopyConstructor, pooler) {
+	  var NewKlass = CopyConstructor;
+	  NewKlass.instancePool = [];
+	  NewKlass.getPooled = pooler || DEFAULT_POOLER;
+	  if (!NewKlass.poolSize) {
+	    NewKlass.poolSize = DEFAULT_POOL_SIZE;
+	  }
+	  NewKlass.release = standardReleaser;
+	  return NewKlass;
+	};
+
+	var PooledClass = {
+	  addPoolingTo: addPoolingTo,
+	  oneArgumentPooler: oneArgumentPooler,
+	  twoArgumentPooler: twoArgumentPooler,
+	  threeArgumentPooler: threeArgumentPooler,
+	  fiveArgumentPooler: fiveArgumentPooler
+	};
+
+	module.exports = PooledClass;
+
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(43)))
+
+/***/ },
+/* 55 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {/**
+	 * Copyright 2013-2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule traverseAllChildren
+	 */
+
+	"use strict";
+
+	var ReactElement = __webpack_require__(26);
+	var ReactInstanceHandles = __webpack_require__(31);
+
+	var invariant = __webpack_require__(50);
+
+	var SEPARATOR = ReactInstanceHandles.SEPARATOR;
+	var SUBSEPARATOR = ':';
+
+	/**
+	 * TODO: Test that:
+	 * 1. `mapChildren` transforms strings and numbers into `ReactTextComponent`.
+	 * 2. it('should fail when supplied duplicate key', function() {
+	 * 3. That a single child and an array with one item have the same key pattern.
+	 * });
+	 */
+
+	var userProvidedKeyEscaperLookup = {
+	  '=': '=0',
+	  '.': '=1',
+	  ':': '=2'
+	};
+
+	var userProvidedKeyEscapeRegex = /[=.:]/g;
+
+	function userProvidedKeyEscaper(match) {
+	  return userProvidedKeyEscaperLookup[match];
+	}
+
+	/**
+	 * Generate a key string that identifies a component within a set.
+	 *
+	 * @param {*} component A component that could contain a manual key.
+	 * @param {number} index Index that is used if a manual key is not provided.
+	 * @return {string}
+	 */
+	function getComponentKey(component, index) {
+	  if (component && component.key != null) {
+	    // Explicit key
+	    return wrapUserProvidedKey(component.key);
+	  }
+	  // Implicit key determined by the index in the set
+	  return index.toString(36);
+	}
+
+	/**
+	 * Escape a component key so that it is safe to use in a reactid.
+	 *
+	 * @param {*} key Component key to be escaped.
+	 * @return {string} An escaped string.
+	 */
+	function escapeUserProvidedKey(text) {
+	  return ('' + text).replace(
+	    userProvidedKeyEscapeRegex,
+	    userProvidedKeyEscaper
+	  );
+	}
+
+	/**
+	 * Wrap a `key` value explicitly provided by the user to distinguish it from
+	 * implicitly-generated keys generated by a component's index in its parent.
+	 *
+	 * @param {string} key Value of a user-provided `key` attribute
+	 * @return {string}
+	 */
+	function wrapUserProvidedKey(key) {
+	  return '$' + escapeUserProvidedKey(key);
+	}
+
+	/**
+	 * @param {?*} children Children tree container.
+	 * @param {!string} nameSoFar Name of the key path so far.
+	 * @param {!number} indexSoFar Number of children encountered until this point.
+	 * @param {!function} callback Callback to invoke with each child found.
+	 * @param {?*} traverseContext Used to pass information throughout the traversal
+	 * process.
+	 * @return {!number} The number of children in this subtree.
+	 */
+	var traverseAllChildrenImpl =
+	  function(children, nameSoFar, indexSoFar, callback, traverseContext) {
+	    var nextName, nextIndex;
+	    var subtreeCount = 0;  // Count of children found in the current subtree.
+	    if (Array.isArray(children)) {
+	      for (var i = 0; i < children.length; i++) {
+	        var child = children[i];
+	        nextName = (
+	          nameSoFar +
+	          (nameSoFar ? SUBSEPARATOR : SEPARATOR) +
+	          getComponentKey(child, i)
+	        );
+	        nextIndex = indexSoFar + subtreeCount;
+	        subtreeCount += traverseAllChildrenImpl(
+	          child,
+	          nextName,
+	          nextIndex,
+	          callback,
+	          traverseContext
+	        );
+	      }
+	    } else {
+	      var type = typeof children;
+	      var isOnlyChild = nameSoFar === '';
+	      // If it's the only child, treat the name as if it was wrapped in an array
+	      // so that it's consistent if the number of children grows
+	      var storageName =
+	        isOnlyChild ? SEPARATOR + getComponentKey(children, 0) : nameSoFar;
+	      if (children == null || type === 'boolean') {
+	        // All of the above are perceived as null.
+	        callback(traverseContext, null, storageName, indexSoFar);
+	        subtreeCount = 1;
+	      } else if (type === 'string' || type === 'number' ||
+	                 ReactElement.isValidElement(children)) {
+	        callback(traverseContext, children, storageName, indexSoFar);
+	        subtreeCount = 1;
+	      } else if (type === 'object') {
+	        ("production" !== process.env.NODE_ENV ? invariant(
+	          !children || children.nodeType !== 1,
+	          'traverseAllChildren(...): Encountered an invalid child; DOM ' +
+	          'elements are not valid children of React components.'
+	        ) : invariant(!children || children.nodeType !== 1));
+	        for (var key in children) {
+	          if (children.hasOwnProperty(key)) {
+	            nextName = (
+	              nameSoFar + (nameSoFar ? SUBSEPARATOR : SEPARATOR) +
+	              wrapUserProvidedKey(key) + SUBSEPARATOR +
+	              getComponentKey(children[key], 0)
+	            );
+	            nextIndex = indexSoFar + subtreeCount;
+	            subtreeCount += traverseAllChildrenImpl(
+	              children[key],
+	              nextName,
+	              nextIndex,
+	              callback,
+	              traverseContext
+	            );
+	          }
+	        }
+	      }
+	    }
+	    return subtreeCount;
+	  };
+
+	/**
+	 * Traverses children that are typically specified as `props.children`, but
+	 * might also be specified through attributes:
+	 *
+	 * - `traverseAllChildren(this.props.children, ...)`
+	 * - `traverseAllChildren(this.props.leftPanelChildren, ...)`
+	 *
+	 * The `traverseContext` is an optional argument that is passed through the
+	 * entire traversal. It can be used to store accumulations or anything else that
+	 * the callback might find relevant.
+	 *
+	 * @param {?*} children Children tree object.
+	 * @param {!function} callback To invoke upon traversing each child.
+	 * @param {?*} traverseContext Context for traversal.
+	 * @return {!number} The number of children in this subtree.
+	 */
+	function traverseAllChildren(children, callback, traverseContext) {
+	  if (children == null) {
+	    return 0;
+	  }
+
+	  return traverseAllChildrenImpl(children, '', 0, callback, traverseContext);
+	}
+
+	module.exports = traverseAllChildren;
 
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(43)))
 
@@ -21416,7 +21365,7 @@
 
 	"use strict";
 
-	var keyMirror = __webpack_require__(55);
+	var keyMirror = __webpack_require__(53);
 
 	var ReactPropTypeLocations = keyMirror({
 	  prop: null,
@@ -22610,7 +22559,7 @@
 	var EventPluginHub = __webpack_require__(112);
 	var EventPropagators = __webpack_require__(116);
 	var ExecutionEnvironment = __webpack_require__(42);
-	var ReactUpdates = __webpack_require__(54);
+	var ReactUpdates = __webpack_require__(52);
 	var SyntheticEvent = __webpack_require__(118);
 
 	var isEventSupported = __webpack_require__(69);
@@ -23855,7 +23804,7 @@
 
 	"use strict";
 
-	var ReactUpdates = __webpack_require__(54);
+	var ReactUpdates = __webpack_require__(52);
 	var Transaction = __webpack_require__(105);
 
 	var assign = __webpack_require__(39);
@@ -23938,7 +23887,7 @@
 	var ReactElement = __webpack_require__(26);
 	var ReactDOM = __webpack_require__(28);
 
-	var keyMirror = __webpack_require__(55);
+	var keyMirror = __webpack_require__(53);
 
 	// Store a reference to the <button> `ReactDOMComponent`. TODO: use string
 	var button = ReactElement.createFactory(ReactDOM.button.type);
@@ -24115,7 +24064,7 @@
 	var ReactElement = __webpack_require__(26);
 	var ReactDOM = __webpack_require__(28);
 	var ReactMount = __webpack_require__(33);
-	var ReactUpdates = __webpack_require__(54);
+	var ReactUpdates = __webpack_require__(52);
 
 	var assign = __webpack_require__(39);
 	var invariant = __webpack_require__(50);
@@ -24350,7 +24299,7 @@
 	var ReactCompositeComponent = __webpack_require__(23);
 	var ReactElement = __webpack_require__(26);
 	var ReactDOM = __webpack_require__(28);
-	var ReactUpdates = __webpack_require__(54);
+	var ReactUpdates = __webpack_require__(52);
 
 	var assign = __webpack_require__(39);
 
@@ -24539,7 +24488,7 @@
 	var ReactCompositeComponent = __webpack_require__(23);
 	var ReactElement = __webpack_require__(26);
 	var ReactDOM = __webpack_require__(28);
-	var ReactUpdates = __webpack_require__(54);
+	var ReactUpdates = __webpack_require__(52);
 
 	var assign = __webpack_require__(39);
 	var invariant = __webpack_require__(50);
@@ -24679,10 +24628,10 @@
 
 	var EventListener = __webpack_require__(130);
 	var ExecutionEnvironment = __webpack_require__(42);
-	var PooledClass = __webpack_require__(51);
+	var PooledClass = __webpack_require__(54);
 	var ReactInstanceHandles = __webpack_require__(31);
 	var ReactMount = __webpack_require__(33);
-	var ReactUpdates = __webpack_require__(54);
+	var ReactUpdates = __webpack_require__(52);
 
 	var assign = __webpack_require__(39);
 	var getEventTarget = __webpack_require__(131);
@@ -24873,7 +24822,7 @@
 	var ReactNativeComponent = __webpack_require__(107);
 	var ReactPerf = __webpack_require__(35);
 	var ReactRootIndex = __webpack_require__(95);
-	var ReactUpdates = __webpack_require__(54);
+	var ReactUpdates = __webpack_require__(52);
 
 	var ReactInjection = {
 	  Component: ReactComponent.injection,
@@ -26119,7 +26068,7 @@
 
 	"use strict";
 
-	var keyMirror = __webpack_require__(55);
+	var keyMirror = __webpack_require__(53);
 
 	/**
 	 * When a component's children are updated, a series of update configuration
@@ -26158,7 +26107,7 @@
 
 	var ReactTextComponent = __webpack_require__(38);
 
-	var traverseAllChildren = __webpack_require__(52);
+	var traverseAllChildren = __webpack_require__(55);
 	var warning = __webpack_require__(48);
 
 	/**
@@ -26319,7 +26268,7 @@
 
 	"use strict";
 
-	var PooledClass = __webpack_require__(51);
+	var PooledClass = __webpack_require__(54);
 	var CallbackQueue = __webpack_require__(104);
 	var ReactPutListenerQueue = __webpack_require__(147);
 	var Transaction = __webpack_require__(105);
@@ -26462,7 +26411,7 @@
 
 	"use strict";
 
-	var PooledClass = __webpack_require__(51);
+	var PooledClass = __webpack_require__(54);
 
 	var assign = __webpack_require__(39);
 	var invariant = __webpack_require__(50);
@@ -28055,7 +28004,7 @@
 
 	"use strict";
 
-	var PooledClass = __webpack_require__(51);
+	var PooledClass = __webpack_require__(54);
 
 	var assign = __webpack_require__(39);
 	var emptyFunction = __webpack_require__(100);
@@ -28773,7 +28722,7 @@
 	"use strict";
 
 	var CallbackQueue = __webpack_require__(104);
-	var PooledClass = __webpack_require__(51);
+	var PooledClass = __webpack_require__(54);
 	var ReactBrowserEventEmitter = __webpack_require__(68);
 	var ReactInputSelection = __webpack_require__(120);
 	var ReactPutListenerQueue = __webpack_require__(147);
@@ -30304,7 +30253,7 @@
 
 	"use strict";
 
-	var PooledClass = __webpack_require__(51);
+	var PooledClass = __webpack_require__(54);
 	var ReactBrowserEventEmitter = __webpack_require__(68);
 
 	var assign = __webpack_require__(39);
