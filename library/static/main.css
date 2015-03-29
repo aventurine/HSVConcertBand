@@ -1,3 +1,9 @@
+/* ------------------------------------ APP BODY --- */
+.composition-grid .form-control {
+  margin: 20px;
+}
+
+/* --------------------------------------- MODAL --- */
 .skylight-dialog {
     width: 50%;
     height: 400px;
