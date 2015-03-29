@@ -159,3 +159,6 @@ LOGGING = {
         },
     }
 }
+
+DATE_FMT = '%b %d %Y'
+

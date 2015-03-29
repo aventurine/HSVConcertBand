@@ -59,7 +59,7 @@
 	var Detail = React.createClass({displayName: "Detail",
 	  //{this.props.rowData.trackName}
 	  handleClick: function (data){
-	    console.log(data);
+	    //console.log(data);
 	  },
 	  render:function(){
 	    return (
@@ -212,23 +212,24 @@
 	    cb: React.PropTypes.func.isRequired
 	  },
 	  handleSubmit:function (){
-	    var url = '/compositions?callback=cb';
+	    var url = '/compositions';
 	    /*
 	    For Example,
 	    //`https://itunes.apple.com/search?term=${this.refs.searchInput.getDOMNode().value}&entity=${this.refs.selectInput.getDOMNode().value}&callback=cb`;
 	    */
 	    $.ajax({
 	      url: url,
-
-	      dataType: 'JSONP',
+	      dataType: 'JSON',
 	      error: function(error){
 	        console.log('error on post:' + error);
 	      },
 	      success: function(data){
+	        //console.log('success: ' + data);
 	        this.refs.searchInput.getDOMNode().value = '';
-	        this.props.cb(data.results);
+	        this.props.cb(data);
 	      }.bind(this)
 	    })
+
 	  },
 	  handleReturn:function(e){
 	    if(e.keyCode === 13) this.handleSubmit();
@@ -16925,7 +16926,7 @@
 
 	"use strict";
 
-	var ReactRootIndex = __webpack_require__(96);
+	var ReactRootIndex = __webpack_require__(94);
 
 	var invariant = __webpack_require__(49);
 
@@ -17520,9 +17521,9 @@
 	var ReactInstanceHandles = __webpack_require__(30);
 	var ReactPerf = __webpack_require__(34);
 
-	var containsNode = __webpack_require__(94);
+	var containsNode = __webpack_require__(97);
 	var deprecated = __webpack_require__(39);
-	var getReactRootElementInContainer = __webpack_require__(95);
+	var getReactRootElementInContainer = __webpack_require__(98);
 	var instantiateReactComponent = __webpack_require__(60);
 	var invariant = __webpack_require__(49);
 	var shouldUpdateReactComponent = __webpack_require__(64);
@@ -18215,9 +18216,9 @@
 	"use strict";
 
 	var ReactComponent = __webpack_require__(21);
-	var ReactMultiChildUpdateTypes = __webpack_require__(97);
+	var ReactMultiChildUpdateTypes = __webpack_require__(95);
 
-	var flattenChildren = __webpack_require__(98);
+	var flattenChildren = __webpack_require__(96);
 	var instantiateReactComponent = __webpack_require__(60);
 	var shouldUpdateReactComponent = __webpack_require__(64);
 
@@ -18736,7 +18737,7 @@
 	var ReactPropTypeLocationNames = __webpack_require__(59);
 
 	var deprecated = __webpack_require__(39);
-	var emptyFunction = __webpack_require__(99);
+	var emptyFunction = __webpack_require__(101);
 
 	/**
 	 * Collection of methods that allow declaration and validation of props that are
@@ -19092,9 +19093,9 @@
 
 	var ReactElement = __webpack_require__(25);
 	var ReactInstanceHandles = __webpack_require__(30);
-	var ReactMarkupChecksum = __webpack_require__(100);
+	var ReactMarkupChecksum = __webpack_require__(99);
 	var ReactServerRenderingTransaction =
-	  __webpack_require__(101);
+	  __webpack_require__(100);
 
 	var instantiateReactComponent = __webpack_require__(60);
 	var invariant = __webpack_require__(49);
@@ -20055,7 +20056,7 @@
 
 	"use strict";
 
-	var emptyFunction = __webpack_require__(99);
+	var emptyFunction = __webpack_require__(101);
 
 	/**
 	 * Similar to invariant but only logs a warning if the condition is not met.
@@ -21171,7 +21172,7 @@
 	"use strict";
 
 	var assign = __webpack_require__(38);
-	var emptyFunction = __webpack_require__(99);
+	var emptyFunction = __webpack_require__(101);
 	var invariant = __webpack_require__(49);
 	var joinClasses = __webpack_require__(105);
 	var warning = __webpack_require__(47);
@@ -23595,7 +23596,7 @@
 
 	var EventConstants = __webpack_require__(48);
 
-	var emptyFunction = __webpack_require__(99);
+	var emptyFunction = __webpack_require__(101);
 
 	var topLevelTypes = EventConstants.topLevelTypes;
 
@@ -23657,12 +23658,12 @@
 	"use strict";
 
 	var ReactDOMIDOperations = __webpack_require__(123);
-	var ReactMarkupChecksum = __webpack_require__(100);
+	var ReactMarkupChecksum = __webpack_require__(99);
 	var ReactMount = __webpack_require__(32);
 	var ReactPerf = __webpack_require__(34);
 	var ReactReconcileTransaction = __webpack_require__(124);
 
-	var getReactRootElementInContainer = __webpack_require__(95);
+	var getReactRootElementInContainer = __webpack_require__(98);
 	var invariant = __webpack_require__(49);
 	var setInnerHTML = __webpack_require__(125);
 
@@ -23783,7 +23784,7 @@
 	var Transaction = __webpack_require__(104);
 
 	var assign = __webpack_require__(38);
-	var emptyFunction = __webpack_require__(99);
+	var emptyFunction = __webpack_require__(101);
 
 	var RESET_BATCHED_UPDATES = {
 	  initialize: emptyFunction,
@@ -24796,7 +24797,7 @@
 	var ReactBrowserEventEmitter = __webpack_require__(67);
 	var ReactNativeComponent = __webpack_require__(106);
 	var ReactPerf = __webpack_require__(34);
-	var ReactRootIndex = __webpack_require__(96);
+	var ReactRootIndex = __webpack_require__(94);
 	var ReactUpdates = __webpack_require__(53);
 
 	var ReactInjection = {
@@ -25916,93 +25917,6 @@
 	 * LICENSE file in the root directory of this source tree. An additional grant
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 *
-	 * @providesModule containsNode
-	 * @typechecks
-	 */
-
-	var isTextNode = __webpack_require__(144);
-
-	/*jslint bitwise:true */
-
-	/**
-	 * Checks if a given DOM node contains or is another DOM node.
-	 *
-	 * @param {?DOMNode} outerNode Outer DOM node.
-	 * @param {?DOMNode} innerNode Inner DOM node.
-	 * @return {boolean} True if `outerNode` contains or is `innerNode`.
-	 */
-	function containsNode(outerNode, innerNode) {
-	  if (!outerNode || !innerNode) {
-	    return false;
-	  } else if (outerNode === innerNode) {
-	    return true;
-	  } else if (isTextNode(outerNode)) {
-	    return false;
-	  } else if (isTextNode(innerNode)) {
-	    return containsNode(outerNode, innerNode.parentNode);
-	  } else if (outerNode.contains) {
-	    return outerNode.contains(innerNode);
-	  } else if (outerNode.compareDocumentPosition) {
-	    return !!(outerNode.compareDocumentPosition(innerNode) & 16);
-	  } else {
-	    return false;
-	  }
-	}
-
-	module.exports = containsNode;
-
-
-/***/ },
-/* 95 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule getReactRootElementInContainer
-	 */
-
-	"use strict";
-
-	var DOC_NODE_TYPE = 9;
-
-	/**
-	 * @param {DOMElement|DOMDocument} container DOM element that may contain
-	 *                                           a React component
-	 * @return {?*} DOM element that may have the reactRoot ID, or null.
-	 */
-	function getReactRootElementInContainer(container) {
-	  if (!container) {
-	    return null;
-	  }
-
-	  if (container.nodeType === DOC_NODE_TYPE) {
-	    return container.documentElement;
-	  } else {
-	    return container.firstChild;
-	  }
-	}
-
-	module.exports = getReactRootElementInContainer;
-
-
-/***/ },
-/* 96 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
 	 * @providesModule ReactRootIndex
 	 * @typechecks
 	 */
@@ -26027,7 +25941,7 @@
 
 
 /***/ },
-/* 97 */
+/* 95 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -26064,7 +25978,7 @@
 
 
 /***/ },
-/* 98 */
+/* 96 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -26136,7 +26050,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(42)))
 
 /***/ },
-/* 99 */
+/* 97 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -26147,34 +26061,83 @@
 	 * LICENSE file in the root directory of this source tree. An additional grant
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 *
-	 * @providesModule emptyFunction
+	 * @providesModule containsNode
+	 * @typechecks
 	 */
 
-	function makeEmptyFunction(arg) {
-	  return function() {
-	    return arg;
-	  };
-	}
+	var isTextNode = __webpack_require__(144);
+
+	/*jslint bitwise:true */
 
 	/**
-	 * This function accepts and discards inputs; it has no side effects. This is
-	 * primarily useful idiomatically for overridable function endpoints which
-	 * always need to be callable, since JS lacks a null-call idiom ala Cocoa.
+	 * Checks if a given DOM node contains or is another DOM node.
+	 *
+	 * @param {?DOMNode} outerNode Outer DOM node.
+	 * @param {?DOMNode} innerNode Inner DOM node.
+	 * @return {boolean} True if `outerNode` contains or is `innerNode`.
 	 */
-	function emptyFunction() {}
+	function containsNode(outerNode, innerNode) {
+	  if (!outerNode || !innerNode) {
+	    return false;
+	  } else if (outerNode === innerNode) {
+	    return true;
+	  } else if (isTextNode(outerNode)) {
+	    return false;
+	  } else if (isTextNode(innerNode)) {
+	    return containsNode(outerNode, innerNode.parentNode);
+	  } else if (outerNode.contains) {
+	    return outerNode.contains(innerNode);
+	  } else if (outerNode.compareDocumentPosition) {
+	    return !!(outerNode.compareDocumentPosition(innerNode) & 16);
+	  } else {
+	    return false;
+	  }
+	}
 
-	emptyFunction.thatReturns = makeEmptyFunction;
-	emptyFunction.thatReturnsFalse = makeEmptyFunction(false);
-	emptyFunction.thatReturnsTrue = makeEmptyFunction(true);
-	emptyFunction.thatReturnsNull = makeEmptyFunction(null);
-	emptyFunction.thatReturnsThis = function() { return this; };
-	emptyFunction.thatReturnsArgument = function(arg) { return arg; };
-
-	module.exports = emptyFunction;
+	module.exports = containsNode;
 
 
 /***/ },
-/* 100 */
+/* 98 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright 2013-2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule getReactRootElementInContainer
+	 */
+
+	"use strict";
+
+	var DOC_NODE_TYPE = 9;
+
+	/**
+	 * @param {DOMElement|DOMDocument} container DOM element that may contain
+	 *                                           a React component
+	 * @return {?*} DOM element that may have the reactRoot ID, or null.
+	 */
+	function getReactRootElementInContainer(container) {
+	  if (!container) {
+	    return null;
+	  }
+
+	  if (container.nodeType === DOC_NODE_TYPE) {
+	    return container.documentElement;
+	  } else {
+	    return container.firstChild;
+	  }
+	}
+
+	module.exports = getReactRootElementInContainer;
+
+
+/***/ },
+/* 99 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -26226,7 +26189,7 @@
 
 
 /***/ },
-/* 101 */
+/* 100 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -26249,7 +26212,7 @@
 	var Transaction = __webpack_require__(104);
 
 	var assign = __webpack_require__(38);
-	var emptyFunction = __webpack_require__(99);
+	var emptyFunction = __webpack_require__(101);
 
 	/**
 	 * Provides a `CallbackQueue` queue for collecting `onDOMReady` callbacks
@@ -26340,6 +26303,44 @@
 	PooledClass.addPoolingTo(ReactServerRenderingTransaction);
 
 	module.exports = ReactServerRenderingTransaction;
+
+
+/***/ },
+/* 101 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright 2013-2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule emptyFunction
+	 */
+
+	function makeEmptyFunction(arg) {
+	  return function() {
+	    return arg;
+	  };
+	}
+
+	/**
+	 * This function accepts and discards inputs; it has no side effects. This is
+	 * primarily useful idiomatically for overridable function endpoints which
+	 * always need to be callable, since JS lacks a null-call idiom ala Cocoa.
+	 */
+	function emptyFunction() {}
+
+	emptyFunction.thatReturns = makeEmptyFunction;
+	emptyFunction.thatReturnsFalse = makeEmptyFunction(false);
+	emptyFunction.thatReturnsTrue = makeEmptyFunction(true);
+	emptyFunction.thatReturnsNull = makeEmptyFunction(null);
+	emptyFunction.thatReturnsThis = function() { return this; };
+	emptyFunction.thatReturnsArgument = function(arg) { return arg; };
+
+	module.exports = emptyFunction;
 
 
 /***/ },
@@ -27982,7 +27983,7 @@
 	var PooledClass = __webpack_require__(50);
 
 	var assign = __webpack_require__(38);
-	var emptyFunction = __webpack_require__(99);
+	var emptyFunction = __webpack_require__(101);
 	var getEventTarget = __webpack_require__(130);
 
 	/**
@@ -28190,7 +28191,7 @@
 
 	var ReactDOMSelection = __webpack_require__(151);
 
-	var containsNode = __webpack_require__(94);
+	var containsNode = __webpack_require__(97);
 	var focusNode = __webpack_require__(152);
 	var getActiveElement = __webpack_require__(132);
 
@@ -29206,7 +29207,7 @@
 	 * @typechecks
 	 */
 
-	var emptyFunction = __webpack_require__(99);
+	var emptyFunction = __webpack_require__(101);
 
 	/**
 	 * Upstream version of event listener. Does not take into account specific
@@ -30764,7 +30765,7 @@
 	"use strict";
 
 	var Danger = __webpack_require__(159);
-	var ReactMultiChildUpdateTypes = __webpack_require__(97);
+	var ReactMultiChildUpdateTypes = __webpack_require__(95);
 
 	var getTextContentAccessor = __webpack_require__(121);
 	var invariant = __webpack_require__(49);
@@ -31198,7 +31199,7 @@
 	var ExecutionEnvironment = __webpack_require__(41);
 
 	var createNodesFromMarkup = __webpack_require__(160);
-	var emptyFunction = __webpack_require__(99);
+	var emptyFunction = __webpack_require__(101);
 	var getMarkupWrap = __webpack_require__(161);
 	var invariant = __webpack_require__(49);
 
