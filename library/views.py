@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from library.models import Composition
 
+from xlrd import open_workbook
 
 POSSIBLE_PARTS = ['c_piccolo', 'd_flat_piccolo', 'flute_1', 'flute_2', 'flute_3', 'oboe_1', 'oboe_2', 'e_flat_clarinet', 'solo_b_flat_clarinet', 'b_flat_clarinet_1', 'b_flat_clarinet_2', 'b_flat_clarinet_3', 'b_flat_clarinet_4', 'alto_clarinet', 'bass_clarinet', 'contrabass_clarinet', 'bassoon_1', 'bassoon_2', 'soprano_saxophone', 'alto_saxophone_1', 'alto_saxophone_2', 'tenor_saxophone', 'baritone_saxophone', 'solo_cornet', 'cornet_1', 'cornet_2', 'cornet_3', 'trumpet_1', 'trumpet_2', 'trumpet_3', 'f_horn_1', 'f_horn_2', 'f_horn_3', 'f_horn_4', 'e_flat_horn_1', 'e_flat_horn_2', 'e_flat_horn_3', 'e_flat_horn_4', 'trombone_1', 'trombone_2', 'trombone_3', 'baritone_tc', 'baritone_bc', 'bass_tuba', 'string_bass', 'timpani', 'mallets', 'percussion_1', 'percussion_2', 'percussion_other']
 
@@ -30,9 +31,52 @@ def get_compositions(request):
 	compositions = Composition.objects.all()
 	return json_response([mkview(c) for c in compositions])
 
+def post_compositions(request):
+	for file in request.FILES:
+		# this version of the ctor takes a path name
+		# you can also use a file
+		Workbook = open_workbook( file )
+		Worksheet = Workbook.sheet_by_index( 0 )
+
+		# this caches the headers
+		Headers = []
+		for col in range(Worksheet.ncols):
+			Headers.append( Worksheet.cell(0,col).value )
+
+		# create the dictionaries and add them to the data
+		for row in range(1,Worksheet.nrows):
+			composition = Composition.objects.create()
+			for col in range(Worksheet.ncols):
+				if Headers[col] == 'TITLE':
+					composition.title = Worksheet.cell(row,col).value
+				elif Headers[col] == 'TYPE':
+					composition.style = Worksheet.cell(row,col).value
+				elif Headers[col] == 'COMPOSER':
+					composition.composer = Worksheet.cell(row,col).value
+				elif Headers[col] == 'ARRANGER':
+					composition.arranger = Worksheet.cell(row,col).value
+				elif Headers[col] == 'DUR.':
+					composition.duration = Worksheet.cell(row,col).value
+				elif Headers[col] == 'CR DATE':
+					composition.copyright_year = Worksheet.cell(row,col).value
+				elif Headers[col] == 'LAST DIST':
+					composition.date_last_passed_out = Worksheet.cell(row,col).value
+				elif Headers[col] == 'LAST PERF':
+					composition.date_last_performed = Worksheet.cell(row,col).value
+				elif Headers[col] == 'PUBLISHER':
+					composition.publisher = Worksheet.cell(row,col).value
+				elif Headers[col] == 'NOTES':
+					composition.comments = Worksheet.cell(row,col).value
+				NVColl[Headers[col]] = Worksheet.cell(row,col).value
+			composition.save()
+
+	return HttpResponse('OK')
+
 def compositions(request):
 	if request.method == 'GET':
 		return get_compositions(request)
+	elif request.method == 'POST':
+		return post_compositions(request)
 
 def composition_details(request, pk):
     def mkview(album):
