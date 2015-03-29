@@ -34,7 +34,7 @@ def composition_details(request, pk):
     def mkview(album):
         parts = {}
         for part in POSSIBLE_PARTS:
-            if getattr(album, part) != None:
+            if getattr(album, part) != None and getattr(album, part) != "":
                 parts[part] = getattr(album, part)
         return {
             'TITLE': album.title,
