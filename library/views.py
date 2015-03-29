@@ -40,9 +40,8 @@ def composition_details(request, pk):
         for part in POSSIBLE_PARTS:
             if getattr(album, part) != None and getattr(album, part) != "":
                 parts[part] = getattr(album, part)
-        return {
+        details = {
             'TITLE': album.title,
-            'PARTS': parts,
             'COMPOSER': album.composer.name,
             'ARRANGER': album.arranger,
             'PUBLISHER': album.publisher,
@@ -55,4 +54,6 @@ def composition_details(request, pk):
             'FULL_SCORE': album.full_score,
             'CONDENSED_SCORE': album.condensed_score
         }
+        details.update(parts)
+        return details
     return json_response(mkview(Composition.objects.get(id=pk)))
