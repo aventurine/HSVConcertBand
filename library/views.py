@@ -80,13 +80,14 @@ def compositions(request):
 
 def composition_details(request, pk):
     def mkview(album):
-        parts = {}
-        for part in POSSIBLE_PARTS:
-            if getattr(album, part) != None and getattr(album, part) != "":
-                parts[part] = getattr(album, part)
+        def filter_part(part):
+            return getattr(album, part) != None and getattr(album, part) != ""
+        parts = [{'count': getattr(album, part),
+                  'name': part }
+                    for part in POSSIBLE_PARTS if filter_part(part)]
         return {
+            'PARTS': sorted(parts, key=lambda part: part['name']),
             'TITLE': album.title,
-            'PARTS': parts,
             'COMPOSER': album.composer.name,
             'ARRANGER': album.arranger,
             'PUBLISHER': album.publisher,
