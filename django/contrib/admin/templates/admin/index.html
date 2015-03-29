@@ -45,6 +45,27 @@
         </table>
         </div>
     {% endfor %}
+
+    <div class="module">
+    <table>
+        <caption>
+            <a>
+                Import Compositions
+            </a>
+        </caption>
+        <tr>    
+            <th scope="row">
+                <form action="/compositions" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="file" name="spreadsheet" accept=".xlsx">
+                    <input type="submit">
+                </form>
+            </th>
+            <td>&nbsp;</td>
+        </tr>
+    </table>
+    </div>
+
 {% else %}
     <p>{% trans "You don't have permission to edit anything." %}</p>
 {% endif %}

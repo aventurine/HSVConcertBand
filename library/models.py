@@ -6,7 +6,7 @@ from django.db import models
 class Composer(models.Model):
     name = models.CharField(max_length=60)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 def player_field(name, help_text=None):
@@ -28,8 +28,8 @@ class Composition(models.Model):
     style = models.CharField(max_length=60, blank=True)
 
     duration = models.CharField(max_length=60, blank=True)
-    date_last_passed_out = models.DateField(blank=True, null=True)
-    date_last_performed = models.DateField(blank=True, null=True)
+    date_last_passed_out = models.CharField(max_length=60, blank=True)
+    date_last_performed = models.CharField(max_length=60, blank=True)
     comments = models.TextField(blank=True)
 
     full_score = models.CharField(max_length=60, blank=True)
@@ -86,14 +86,8 @@ class Composition(models.Model):
     percussion_2 = player_field('Percussion 2')
     percussion_other = player_field('Percussion other')
 
-    def date_last_passed_out_strfmt(self):
-        return strfmt_date(self.date_last_passed_out)
-
-    def date_last_performed_strfmt(self):
-        return strfmt_date(self.date_last_performed)
-
-    def __str__(self):
-        return '{} ({})'.format(self.title, self.composer.name)
+    def __unicode__(self):
+        return u'{} ({})'.format(self.title, self.composer.name)
 
 admin.site.register(Composer)
 admin.site.register(Composition)

@@ -1,7 +1,7 @@
 import json
 from django.http import HttpResponse
 from django.shortcuts import render
-from library.models import Composition
+from library.models import Composition, Composer
 
 from xlrd import open_workbook
 
@@ -14,69 +14,74 @@ def index(request):
     return render(request, 'index.html')
 
 def get_compositions(request):
-	def mkview(album):
-		return {
-			'ID': album.id,
-			'TITLE': album.title,
-			'TYPE': album.style,
-			'COMPOSER': album.composer.name,
-			'ARRANGER': album.arranger,
-			'DUR': album.duration,
-			'CR DATE': album.copyright_year,
-			'LAST DIST': album.date_last_passed_out_strfmt(),
-			'LAST PERF': album.date_last_performed_strfmt(),
-			'PUBLISHER': album.publisher
-		}
+    def mkview(album):
+        return {
+            'ID': album.id,
+            'TITLE': album.title,
+            'TYPE': album.style,
+            'COMPOSER': album.composer.name,
+            'ARRANGER': album.arranger,
+            'DUR': album.duration,
+            'CR DATE': album.copyright_year,
+            'LAST DIST': album.date_last_passed_out,
+            'LAST PERF': album.date_last_performed,
+            'PUBLISHER': album.publisher
+        }
 
-	compositions = Composition.objects.all()
-	return json_response([mkview(c) for c in compositions])
+    compositions = Composition.objects.all()
+    return json_response([mkview(c) for c in compositions])
 
 def post_compositions(request):
-	for file in request.FILES:
-		# this version of the ctor takes a path name
-		# you can also use a file
-		Workbook = open_workbook( file )
-		Worksheet = Workbook.sheet_by_index( 0 )
 
-		# this caches the headers
-		Headers = []
-		for col in range(Worksheet.ncols):
-			Headers.append( Worksheet.cell(0,col).value )
+    for file in request.FILES:
+        # this version of the ctor takes a path name
+        # you can also use a file
 
-		# create the dictionaries and add them to the data
-		for row in range(1,Worksheet.nrows):
-			composition = Composition.objects.create()
-			for col in range(Worksheet.ncols):
-				if Headers[col] == 'TITLE':
-					composition.title = Worksheet.cell(row,col).value
-				elif Headers[col] == 'TYPE':
-					composition.style = Worksheet.cell(row,col).value
-				elif Headers[col] == 'COMPOSER':
-					composition.composer = Worksheet.cell(row,col).value
-				elif Headers[col] == 'ARRANGER':
-					composition.arranger = Worksheet.cell(row,col).value
-				elif Headers[col] == 'DUR.':
-					composition.duration = Worksheet.cell(row,col).value
-				elif Headers[col] == 'CR DATE':
-					composition.copyright_year = Worksheet.cell(row,col).value
-				elif Headers[col] == 'LAST DIST':
-					composition.date_last_passed_out = Worksheet.cell(row,col).value
-				elif Headers[col] == 'LAST PERF':
-					composition.date_last_performed = Worksheet.cell(row,col).value
-				elif Headers[col] == 'PUBLISHER':
-					composition.publisher = Worksheet.cell(row,col).value
-				elif Headers[col] == 'NOTES':
-					composition.comments = Worksheet.cell(row,col).value
-				NVColl[Headers[col]] = Worksheet.cell(row,col).value
-			composition.save()
+        Workbook = open_workbook( file_contents=request.FILES[file].read() )
+        Worksheet = Workbook.sheet_by_index( 0 )
 
-	return HttpResponse('OK')
+        # this caches the headers
+        Headers = []
+        for col in range(Worksheet.ncols):
+            Headers.append( Worksheet.cell(0,col).value )
+
+        # create the dictionaries and add them to the data
+        for row in range(1,Worksheet.nrows):
+            composition = Composition()
+            for col in range(Worksheet.ncols):
+                if Headers[col] == 'TITLE':
+                    composition.title = Worksheet.cell(row,col).value
+                elif Headers[col] == 'TYPE':
+                    composition.style = Worksheet.cell(row,col).value
+                elif Headers[col] == 'COMPOSER':
+                    composer_name = Worksheet.cell(row,col).value
+                    composer, _ = Composer.objects.get_or_create(name=composer_name)
+                    composition.composer = composer
+                elif Headers[col] == 'ARRANGER':
+                    composition.arranger = Worksheet.cell(row,col).value
+                elif Headers[col] == 'DUR.':
+                    composition.duration = Worksheet.cell(row,col).value
+                elif Headers[col] == 'CR DATE':
+                    composition.copyright_year = Worksheet.cell(row,col).value
+                elif Headers[col] == 'LAST DIST':
+                    composition.date_last_passed_out = Worksheet.cell(row,col).value
+                elif Headers[col] == 'LAST PERF':
+                    composition.date_last_performed = Worksheet.cell(row,col).value
+                elif Headers[col] == 'PUBLISHER':
+                    composition.publisher = Worksheet.cell(row,col).value
+                elif Headers[col] == 'NOTES':
+                    composition.comments = Worksheet.cell(row,col).value
+            if composition.composer is None:
+                composition.composer = Composer.objects.create(name="unknown")
+            composition.save()
+
+    return HttpResponse('OK')
 
 def compositions(request):
-	if request.method == 'GET':
-		return get_compositions(request)
-	elif request.method == 'POST':
-		return post_compositions(request)
+    if request.method == 'GET':
+        return get_compositions(request)
+    elif request.method == 'POST':
+        return post_compositions(request)
 
 def composition_details(request, pk):
     def mkview(album):
@@ -94,8 +99,8 @@ def composition_details(request, pk):
             'COPYRIGHT_YEAR': album.copyright_year,
             'STYLE': album.style,
             'DURATION': album.duration,
-            'DATE_LAST_PASSED_OUT': album.date_last_passed_out_strfmt(),
-            'DATE_LAST_PERFORMED': album.date_last_performed_strfmt(),
+            'DATE_LAST_PASSED_OUT': album.date_last_passed_out,
+            'DATE_LAST_PERFORMED': album.date_last_performed,
             'COMMENTS': album.comments,
             'FULL_SCORE': album.full_score,
             'CONDENSED_SCORE': album.condensed_score
