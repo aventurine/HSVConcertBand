@@ -1,7 +1,8 @@
 import json
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from django.shortcuts import render
-from library.models import Composition, Composer
+from library.models import Composition
 
 from xlrd import open_workbook
 
@@ -19,12 +20,9 @@ def get_compositions(request):
             'ID': album.id,
             'TITLE': album.title,
             'TYPE': album.style,
-            'COMPOSER': album.composer.name,
+            'COMPOSER': album.composer,
             'ARRANGER': album.arranger,
             'DUR': album.duration,
-            'CR DATE': album.copyright_year,
-            'LAST DIST': album.date_last_passed_out,
-            'LAST PERF': album.date_last_performed,
             'PUBLISHER': album.publisher
         }
 
@@ -54,9 +52,7 @@ def post_compositions(request):
                 elif Headers[col] == 'TYPE':
                     composition.style = Worksheet.cell(row,col).value
                 elif Headers[col] == 'COMPOSER':
-                    composer_name = Worksheet.cell(row,col).value
-                    composer, _ = Composer.objects.get_or_create(name=composer_name)
-                    composition.composer = composer
+                    composition.composer = Worksheet.cell(row,col).value
                 elif Headers[col] == 'ARRANGER':
                     composition.arranger = Worksheet.cell(row,col).value
                 elif Headers[col] == 'DUR.':
@@ -71,9 +67,10 @@ def post_compositions(request):
                     composition.publisher = Worksheet.cell(row,col).value
                 elif Headers[col] == 'NOTES':
                     composition.comments = Worksheet.cell(row,col).value
-            if composition.composer is None:
-                composition.composer = Composer.objects.create(name="unknown")
-            composition.save()
+            try:
+                Composition.objects.get(title=composition.title)
+            except ObjectDoesNotExist:
+                composition.save()
 
     return HttpResponse('OK')
 
@@ -93,7 +90,7 @@ def composition_details(request, pk):
         return {
             'PARTS': sorted(parts, key=lambda part: part['name']),
             'TITLE': album.title,
-            'COMPOSER': album.composer.name,
+            'COMPOSER': album.composer,
             'ARRANGER': album.arranger,
             'PUBLISHER': album.publisher,
             'COPYRIGHT_YEAR': album.copyright_year,

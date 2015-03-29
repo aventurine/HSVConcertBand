@@ -3,12 +3,6 @@ from django.contrib import admin
 from django.db import models
 
 
-class Composer(models.Model):
-    name = models.CharField(max_length=60)
-
-    def __unicode__(self):
-        return self.name
-
 def player_field(name, help_text=None):
     return models.CharField(max_length=60, verbose_name=name, blank=True, null=True, help_text=help_text)
 
@@ -21,7 +15,7 @@ def strfmt_date(date):
 class Composition(models.Model):
 
     title = models.CharField(max_length=60)
-    composer = models.ForeignKey(Composer)
+    composer = models.CharField(max_length=60)
     arranger = models.CharField(max_length=60, blank=True)
     publisher = models.CharField(max_length=60, blank=True)
     copyright_year = models.CharField(max_length=60, verbose_name ='Copyright year', blank=True, null=True)
@@ -87,7 +81,6 @@ class Composition(models.Model):
     percussion_other = player_field('Percussion other')
 
     def __unicode__(self):
-        return u'{} ({})'.format(self.title, self.composer.name)
+        return u'{} ({})'.format(self.title, self.composer)
 
-admin.site.register(Composer)
 admin.site.register(Composition)
