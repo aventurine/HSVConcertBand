@@ -12,23 +12,27 @@ def json_response(data):
 def index(request):
     return render(request, 'index.html')
 
-def compositions(request):
-    def mkview(album):
-        return {
-            'ID': album.id,
-            'TITLE': album.title,
-            'TYPE': album.style,
-            'COMPOSER': album.composer.name,
-            'ARRANGER': album.arranger,
-            'DUR': album.duration,
-            'CR DATE': album.copyright_year,
-            'LAST DIST': album.date_last_passed_out_strfmt(),
-            'LAST PERF': album.date_last_performed_strfmt(),
-            'PUBLISHER': album.publisher
-        }
+def get_compositions(request):
+	def mkview(album):
+		return {
+			'ID': album.id,
+			'TITLE': album.title,
+			'TYPE': album.style,
+			'COMPOSER': album.composer.name,
+			'ARRANGER': album.arranger,
+			'DUR': album.duration,
+			'CR DATE': album.copyright_year,
+			'LAST DIST': album.date_last_passed_out_strfmt(),
+			'LAST PERF': album.date_last_performed_strfmt(),
+			'PUBLISHER': album.publisher
+		}
 
-    compositions = Composition.objects.all()
-    return json_response([mkview(c) for c in compositions])
+	compositions = Composition.objects.all()
+	return json_response([mkview(c) for c in compositions])
+
+def compositions(request):
+	if request.method == 'GET':
+		return get_compositions(request)
 
 def composition_details(request, pk):
     def mkview(album):
