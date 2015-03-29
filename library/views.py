@@ -42,7 +42,7 @@ def composition_details(request, pk):
                   'name': part }
                     for part in POSSIBLE_PARTS if filter_part(part)]
         return {
-            'PARTS': parts,
+            'PARTS': sorted(parts, key=lambda part: part['name']),
             'TITLE': album.title,
             'COMPOSER': album.composer.name,
             'ARRANGER': album.arranger,
